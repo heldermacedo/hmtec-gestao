@@ -71,7 +71,7 @@
     </header>
 
     <main class="container mx-auto px-4 pb-20">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
             <div class="md:col-span-1 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-2xl">
                 <h2 class="text-2xl font-bold mb-6 text-white tracking-tight flex items-center">
@@ -99,13 +99,24 @@
                         <label class="block text-sm font-medium text-gray-400">Data de Entrada</label>
                         <input type="date" name="entryDate" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
+
+<div>
+    <label class="block text-sm font-medium text-gray-400">Status Inicial</label>
+    <select name="status" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 focus:ring-[var(--hmtec-lime-green)] bg-gray-900">
+        <option value="Aguardando Autorização">Aguardando Autorização</option>
+        <option value="Aguardando Peças">Aguardando Peças</option>
+        <option value="Aguardando Testes Finais">Aguardando Testes Finais</option>
+        <option value="Finalizado">Finalizado</option>
+    </select>
+</div>
+                    
                     <button type="submit" class="w-full hmtec-btn-purple p-3 rounded-xl font-bold text-lg tracking-tight">
                         Cadastrar na Bancada
                     </button>
                 </form>
             </div>
 
-            <div class="md:col-span-2 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-2xl">
+            <div class="lg:col-span-3 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-2xl">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
                         <span class="w-2 h-6 bg-[var(--hmtec-lime-green)] mr-3"></span>
@@ -123,11 +134,12 @@
                                 <th class="py-3 px-4">Cliente</th>
                                 <th class="py-3 px-4">Serviço</th>
                                 <th class="py-3 px-4">Entrada</th>
+                                <th class="py-3 px-4">Status Cliente</th>
                                 <th class="py-3 px-4">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="pc-table-body">
-                            <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+                                                        <tr class="border-b border-gray-800 hover:bg-gray-800/50">
                                 <td class="py-4 px-4 font-medium text-white">Marcelo (i5 14600KF)</td>
                                 <td class="py-4 px-4">Limpeza DeepTech + Pasta Térmica</td>
                                 <td class="py-4 px-4">30/03/26</td>
@@ -178,35 +190,58 @@
         }
 
         data.forEach(item => {
-    // 1. Tratamento da Data: Converte de ISO para DD/MM/AAAA
-    let dataFormatada = "Sem Data";
-    if (item.entryDate) {
-        // Separa a string no "T" e pega apenas a parte da data "YYYY-MM-DD"
-        const dataApenas = item.entryDate.split('T')[0]; 
-        const partes = dataApenas.split('-'); // Quebra em [Ano, Mês, Dia]
-        if (partes.length === 3) {
-            dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; // Monta como Dia/Mês/Ano
-        }
-    }
+            // Tratamento da Data
+            let dataFormatada = "Sem Data";
+            if (item.entryDate) {
+                const dataApenas = item.entryDate.split('T')[0]; 
+                const partes = dataApenas.split('-'); 
+                if (partes.length === 3) {
+                    dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                }
+            }
 
-    // 2. Criação da Linha
-    const row = document.createElement('tr');
-    row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
-    
-    // Note que substituímos ${item.entryDate} por ${dataFormatada} na coluna de Entrada
-    row.innerHTML = `
-        <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
-        <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
-        <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
-        <td class="py-4 px-4">
-            <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
-                    class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
-                ENVIAR E-MAIL PREMIUM
-            </button>
-        </td>
-    `;
-    tableBody.appendChild(row);
-});
+            const row = document.createElement('tr');
+            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
+            
+            // --- INÍCIO DA NOVA COLUNA DE STATUS ---
+            const opcoesStatus = [
+                { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
+                { nome: 'Aguardando Peças', cor: 'text-orange-400' },
+                { nome: 'Aguardando Testes Finais', cor: 'text-blue-400' },
+                { nome: 'Finalizado', cor: 'text-[var(--hmtec-lime-green)]' }
+            ];
+
+            let opcoesHTML = '';
+            opcoesStatus.forEach(opt => {
+                let selecionado = item.status === opt.nome ? 'selected' : '';
+                opcoesHTML += `<option value="${opt.nome}" ${selecionado} class="bg-gray-900 text-white">${opt.nome}</option>`;
+            });
+
+            let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
+            // --- FIM DA LÓGICA DE STATUS ---
+
+            // Montando as 5 colunas (Cliente, Serviço, Entrada, Status, Ação)
+            row.innerHTML = `
+                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
+                <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
+                <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
+                
+                <td class="py-4 px-4">
+                    <select onchange="atualizarStatus(${item.rowNumber}, this.value, this)" 
+                            class="bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full">
+                        ${opcoesHTML}
+                    </select>
+                </td>
+                
+                <td class="py-4 px-4">
+                    <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
+                            class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
+                        ENVIAR E-MAIL PREMIUM
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
     } catch (error) {
         console.error("Erro técnico:", error);
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de link ou permissão no Google.</td></tr>';
@@ -267,6 +302,20 @@
         alert("Erro ao disparar o e-mail.");
     }
 }
+
+    async function atualizarStatus(rowNumber, novoStatus, selectElement) {
+            selectElement.className = "bg-gray-800 border border-gray-500 text-gray-400 font-bold text-xs p-2 rounded cursor-wait w-full";
+            
+            const url = `${SCRIPT_URL}?action=updateStatus&row=${rowNumber}&status=${encodeURIComponent(novoStatus)}`;
+            
+            try {
+                await fetch(url, { method: 'GET', mode: 'no-cors' });
+                // Sucesso: não fazemos nada visual extra pois a caixa já mudou o texto
+            } catch (e) {
+                alert("Erro ao sincronizar status com a planilha.");
+            }
+        }
+    
 </script>
 </body>
 </html>
