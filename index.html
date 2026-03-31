@@ -8,18 +8,18 @@
     <style>
         /* Cores Customizadas baseadas nas imagens da Hmtec */
         :root {
-            --hmtec-vibrant-purple: #6c5ce7; /* Como na image_2.png */
-            --hmtec-lime-green: #bbff00;    /* Como na image_4.png e image_0.png */
-            --hmtec-dark: #121212;          /* Fundo dark industrial */
+            --hmtec-vibrant-purple: #6c5ce7;
+            --hmtec-lime-green: #bbff00;
+            --hmtec-dark: #121212;
         }
 
-        /* Aplicação do padrão geométrico da image_0.png como fundo em alguns elementos */
+        /* Padrão geométrico */
         .hmtec-geometric-pattern {
             background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 20L10 0H20L10 20H0ZM20 20L30 40H40L30 20H20ZM20 0L30 20H40L30 0H20Z" fill="%23bbff00" opacity="0.1"/></svg>');
             background-size: 20px 20px;
         }
 
-        /* Efeito de pôster amassado sob plástico da image_1.png para o cabeçalho */
+        /* Efeito do cabeçalho */
         .hmtec-header-effect {
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.5)), 
                         url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="1" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" fill="white" opacity="0.05"/></svg>'),
@@ -27,7 +27,6 @@
             box-shadow: 0 0 100px var(--hmtec-vibrant-purple) inset;
         }
 
-        /* Estilo para as fontes e botões */
         .hmtec-lime-outline {
             color: var(--hmtec-dark);
             -webkit-text-stroke: 1.5px var(--hmtec-lime-green);
@@ -49,16 +48,15 @@
         }
         .hmtec-input:focus {
             border-color: var(--hmtec-lime-green);
-            ring-color: var(--hmtec-lime-green);
+            outline: none;
+            box-shadow: 0 0 0 1px var(--hmtec-lime-green);
         }
-
     </style>
 </head>
 <body class="bg-[#121212] font-sans hmtec-geometric-pattern text-gray-200">
 
     <header class="hmtec-header-effect text-white p-8 mb-8 border-b-2 border-[#bbff00]">
         <div class="container mx-auto text-center relative">
-            
             <div class="absolute left-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
             <div class="absolute right-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
 
@@ -73,7 +71,7 @@
     <main class="container mx-auto px-4 pb-20">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <div class="md:col-span-1 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-2xl">
+            <div class="md:col-span-1 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-2xl h-fit">
                 <h2 class="text-2xl font-bold mb-6 text-white tracking-tight flex items-center">
                     <span class="w-2 h-6 bg-[var(--hmtec-lime-green)] mr-3"></span>
                     Nova Manutenção
@@ -81,16 +79,16 @@
                 <form id="add-pc-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-400">Nome do Cliente</label>
-                        <input type="text" name="clientName" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 focus:ring-[var(--hmtec-lime-green)]">
+                        <input type="text" name="clientName" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-400">Modelo / Setup do PC</label>
                         <input type="text" name="pcModel" placeholder="i7 12ª / 16GB / RTX 3060" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
-    <label class="block text-sm font-medium text-gray-400">E-mail do Cliente</label>
-    <input type="email" name="clientEmail" placeholder="cliente@email.com" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
-</div>
+                        <label class="block text-sm font-medium text-gray-400">E-mail do Cliente</label>
+                        <input type="email" name="clientEmail" placeholder="cliente@email.com" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-400">Serviço Realizado</label>
                         <textarea name="serviceDetails" required class="w-full hmtec-input mt-1 p-3 rounded-xl h-24 focus:ring-1"></textarea>
@@ -99,18 +97,17 @@
                         <label class="block text-sm font-medium text-gray-400">Data de Entrada</label>
                         <input type="date" name="entryDate" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
-
-<div>
-    <label class="block text-sm font-medium text-gray-400">Status Inicial</label>
-    <select name="status" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 focus:ring-[var(--hmtec-lime-green)] bg-gray-900">
-        <option value="Aguardando Autorização">Aguardando Autorização</option>
-        <option value="Aguardando Peças">Aguardando Peças</option>
-        <option value="Aguardando Testes Finais">Aguardando Testes Finais</option>
-        <option value="Finalizado">Finalizado</option>
-    </select>
-</div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">Status Inicial</label>
+                        <select name="status" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 bg-gray-900">
+                            <option value="Aguardando Autorização">Aguardando Autorização</option>
+                            <option value="Aguardando Peças">Aguardando Peças</option>
+                            <option value="Aguardando Testes Finais">Aguardando Testes Finais</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+                    </div>
                     
-                    <button type="submit" class="w-full hmtec-btn-purple p-3 rounded-xl font-bold text-lg tracking-tight">
+                    <button type="submit" class="w-full hmtec-btn-purple p-3 rounded-xl font-bold text-lg tracking-tight mt-4">
                         Cadastrar na Bancada
                     </button>
                 </form>
@@ -120,7 +117,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
                         <span class="w-2 h-6 bg-[var(--hmtec-lime-green)] mr-3"></span>
-                        Computadores em Diagnóstico / Concluídos
+                        Computadores na Bancada
                     </h2>
                     <div class="text-[var(--hmtec-lime-green)] text-sm font-mono bg-black/50 px-4 py-1.5 rounded-full border border-[var(--hmtec-lime-green)]">
                         STATUS: ONLINE
@@ -139,20 +136,7 @@
                             </tr>
                         </thead>
                         <tbody id="pc-table-body">
-                                                        <tr class="border-b border-gray-800 hover:bg-gray-800/50">
-                                <td class="py-4 px-4 font-medium text-white">Marcelo (i5 14600KF)</td>
-                                <td class="py-4 px-4">Limpeza DeepTech + Pasta Térmica</td>
-                                <td class="py-4 px-4">30/03/26</td>
-                                <td class="py-4 px-4">
-                                    <a href="https://wa.me/5579000000000?text=Oi%20Marcelo,%20a%20Hmtec%20concluiu%20o%20diagnóstico..." 
-                                       target="_blank" 
-                                       class="text-[var(--hmtec-lime-green)] font-semibold hover:text-white flex items-center">
-                                        WhatsApp
-                                        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.315 0-4.328 1.237-5.374 3.079l2.711 1.564c.731-1.288 2.133-2.143 3.663-2.143 2.146 0 3.886 1.74 3.886 3.886 0 1.53-.855 2.932-2.143 3.663l-1.564 2.711c1.842 1.046 3.079 3.059 3.079 5.374 0 2.315-1.237 4.328-3.079 5.374l-2.711-1.564c1.288-.731 2.143-2.133 2.143-3.663 0-1.53-.855-2.932-2.143-3.663l1.564-2.711c-1.842-1.046-3.079-3.059-3.079-5.374 0-2.315 1.237-4.328 3.079-5.374l2.711 1.564c-.731 1.288-2.133 2.143-3.663 2.143-2.146 0-3.886-1.74-3.886-3.886 0-1.53.855-2.932 2.143-3.663l-1.564 2.711c-1.842-1.046-3.079-3.059-3.079-5.374z"></path></svg>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -168,6 +152,7 @@
             </p>
         </div>
     </footer>
+
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
     const form = document.getElementById('add-pc-form');
@@ -175,229 +160,229 @@
 
     // Função para buscar dados da Planilha
     async function loadMaintenances() {
-    tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
-    
-    try {
-        // Adicionamos um timestamp no final para evitar que o navegador use o cache antigo
-        const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
-        const data = await response.json();
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
         
-        tableBody.innerHTML = ''; 
-        
-        if (data.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Bancada vazia. Adicione um PC acima!</td></tr>';
-            return;
-        }
-
-        data.forEach(item => {
-           // Tratamento da Data
-            let dataFormatada = "Sem Data";
-            if (item.entryDate) {
-                const dataApenas = item.entryDate.split('T')[0]; 
-                const partes = dataApenas.split('-'); 
-                if (partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+        try {
+            const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
+            const data = await response.json();
+            
+            tableBody.innerHTML = ''; 
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Bancada vazia. Adicione um PC acima!</td></tr>';
+                return;
             }
 
-            // Tratamento do Checklist (lê o que veio do Google)
-            let checks = {};
-            try { checks = JSON.parse(item.checklist); } catch(e) {}
+            data.forEach(item => {
+                // Tratamento da Data
+                let dataFormatada = "Sem Data";
+                if (item.entryDate) {
+                    const dataApenas = item.entryDate.split('T')[0]; 
+                    const partes = dataApenas.split('-'); 
+                    if (partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                }
 
-            const rowId = `gaveta-${item.rowNumber}`;
+                // Tratamento do Checklist
+                let checks = {};
+                try { checks = JSON.parse(item.checklist); } catch(e) {}
 
-            // --- 1. LINHA PRINCIPAL (Onde você clica) ---
-            const row = document.createElement('tr');
-            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer group";
+                const rowId = `gaveta-${item.rowNumber}`;
+
+                // --- 1. LINHA PRINCIPAL ---
+                const row = document.createElement('tr');
+                row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer group";
+                
+                row.onclick = (e) => {
+                    if(e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+                    toggleGaveta(rowId);
+                };
+
+                const opcoesStatus = [
+                    { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
+                    { nome: 'Aguardando Peças', cor: 'text-orange-400' },
+                    { nome: 'Aguardando Testes Finais', cor: 'text-blue-400' },
+                    { nome: 'Finalizado', cor: 'text-[var(--hmtec-lime-green)]' }
+                ];
+
+                let opcoesHTML = '';
+                opcoesStatus.forEach(opt => {
+                    let selecionado = item.status === opt.nome ? 'selected' : '';
+                    opcoesHTML += `<option value="${opt.nome}" ${selecionado} class="bg-gray-900 text-white">${opt.nome}</option>`;
+                });
+                let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
+
+                row.innerHTML = `
+                    <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative whitespace-nowrap">
+                        <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
+                        ${item.clientName}
+                    </td>
+                    <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
+                    <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
+                    <td class="py-4 px-4">
+                        <select onchange="atualizarStatus(${item.rowNumber}, this.value, this)" 
+                                class="bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full">
+                            ${opcoesHTML}
+                        </select>
+                    </td>
+                    <td class="py-4 px-4">
+                        <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
+                                class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2 whitespace-nowrap">
+                            E-MAIL PREMIUM
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+
+                // --- 2. LINHA DA GAVETA (Checklist) ---
+                const gavetaRow = document.createElement('tr');
+                gavetaRow.id = rowId;
+                gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
+                
+                gavetaRow.innerHTML = `
+                    <td colspan="5" class="py-3 px-8">
+                        <div class="flex flex-wrap items-center gap-6">
+                            <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
+                            
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Pontos de Ferrugem</span>
+                            </label>
+                            
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Maresia</span>
+                            </label>
+                            
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Não Liga</span>
+                            </label>
+                            
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Muita Poeira / Sujeira</span>
+                            </label>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(gavetaRow);
             
-            // Lógica para que ao clicar no botão ou select, a gaveta NÃO abra/feche sem querer
-            row.onclick = (e) => {
-                if(e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
-                toggleGaveta(rowId);
-            };
+            }); // <-- O CURTO-CIRCUITO ESTAVA AQUI! Faltava fechar o forEach.
 
+        } catch (error) {
+            console.error("Erro técnico:", error);
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de conexão com a planilha.</td></tr>';
+        }
+    }
+
+    // Função para enviar dados para a Planilha
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.innerText = 'ENVIANDO...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert('Dados enviados para a bancada HMTEC!');
+            form.reset();
+            btn.innerText = 'Cadastrar na Bancada';
+            btn.disabled = false;
+            setTimeout(() => loadMaintenances(), 1500);
+        })
+        .catch(error => {
+            console.error("Erro técnico:", error);
+            alert('Erro ao conectar.');
+            btn.innerText = 'Cadastrar na Bancada';
+            btn.disabled = false;
+        });
+    });
+
+    // Inicia a aplicação
+    loadMaintenances();
+
+    // Funções auxiliares (Globais)
+    async function dispararEmail(email, name, model) {
+        if (!email || email === 'undefined') {
+            alert("E-mail não cadastrado para este cliente.");
+            return;
+        }
+        alert(`Iniciando envio para ${name}... aguarde.`);
+        const url = `${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&model=${encodeURIComponent(model)}`;
+        try {
+            await fetch(url, { method: 'GET', mode: 'no-cors' });
+            alert(`E-mail enviado com sucesso!`);
+        } catch (e) {
+            alert("Erro ao disparar o e-mail.");
+        }
+    }
+
+    async function atualizarStatus(rowNumber, novoStatus, selectElement) {
+        selectElement.className = "bg-gray-800 border border-gray-500 text-gray-400 font-bold text-xs p-2 rounded cursor-wait w-full";
+        const url = `${SCRIPT_URL}?action=updateStatus&row=${rowNumber}&status=${encodeURIComponent(novoStatus)}`;
+        try {
+            await fetch(url, { method: 'GET', mode: 'no-cors' });
+            
+            // Retorna as cores dependendo do status
             const opcoesStatus = [
                 { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
                 { nome: 'Aguardando Peças', cor: 'text-orange-400' },
                 { nome: 'Aguardando Testes Finais', cor: 'text-blue-400' },
                 { nome: 'Finalizado', cor: 'text-[var(--hmtec-lime-green)]' }
             ];
+            let corAtual = opcoesStatus.find(o => o.nome === novoStatus)?.cor || 'text-white';
+            selectElement.className = `bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full`;
 
-            let opcoesHTML = '';
-            opcoesStatus.forEach(opt => {
-                let selecionado = item.status === opt.nome ? 'selected' : '';
-                opcoesHTML += `<option value="${opt.nome}" ${selecionado} class="bg-gray-900 text-white">${opt.nome}</option>`;
-            });
-            let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
-
-            row.innerHTML = `
-                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative">
-                    <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
-                    ${item.clientName}
-                </td>
-                <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
-                <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
-                <td class="py-4 px-4">
-                    <select onchange="atualizarStatus(${item.rowNumber}, this.value, this)" 
-                            class="bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full">
-                        ${opcoesHTML}
-                    </select>
-                </td>
-                <td class="py-4 px-4">
-                    <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
-                            class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
-                        E-MAIL PREMIUM
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-
-            // --- 2. LINHA DA GAVETA (O Checklist escondido) ---
-            const gavetaRow = document.createElement('tr');
-            gavetaRow.id = rowId;
-            gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; // Fundo mais escuro com detalhe roxo
-            
-            gavetaRow.innerHTML = `
-                <td colspan="5" class="py-3 px-8">
-                    <div class="flex items-center gap-6">
-                        <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Pontos de Ferrugem</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Maresia</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Não Liga</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Muita Poeira / Sujeira</span>
-                        </label>
-                    </div>
-                </td>
-            `;
-            tableBody.appendChild(gavetaRow);
-    } catch (error) {
-        console.error("Erro técnico:", error);
-        tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de link ou permissão no Google.</td></tr>';
-    }
-}
-
-    // Função para enviar dados para a Planilha
-    form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.innerText = 'ENVIANDO...';
-    btn.disabled = true;
-
-    // Criamos um objeto com os dados do formulário
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => data[key] = value);
-
-    // Usamos um truque: enviamos como texto plano para o Google não barrar o CORS
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Isso ignora o erro de segurança do navegador
-        headers: {
-            'Content-Type': 'text/plain',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(() => {
-        // Como o 'no-cors' não deixa ler a resposta, assumimos sucesso
-        alert('Dados enviados para a bancada HMTEC!');
-        form.reset();
-        btn.innerText = 'CADASTRAR NA BANCADA';
-        btn.disabled = false;
-        // Espera 2 segundos para o Google salvar e atualiza a tabela
-        setTimeout(() => loadMaintenances(), 2000);
-    })
-    .catch(error => {
-        console.error("Erro técnico:", error);
-        alert('Erro ao conectar. Verifique se o Script está publicado como "Qualquer pessoa".');
-        btn.innerText = 'CADASTRAR NA BANCADA';
-        btn.disabled = false;
-    });
-});
-
-    // Carrega os dados ao abrir o site
-    loadMaintenances();
-
-    async function dispararEmail(email, name, model) {
-    if (!email) {
-        alert("E-mail não cadastrado para este cliente.");
-        return;
-    }
-    const url = `${SCRIPT_URL}?action=sendEmail&email=${email}&name=${name}&model=${model}`;
-    try {
-        await fetch(url);
-        alert(`E-mail enviado com sucesso para ${name}!`);
-    } catch (e) {
-        alert("Erro ao disparar o e-mail.");
-    }
-}
-
-    async function atualizarStatus(rowNumber, novoStatus, selectElement) {
-            selectElement.className = "bg-gray-800 border border-gray-500 text-gray-400 font-bold text-xs p-2 rounded cursor-wait w-full";
-            
-            const url = `${SCRIPT_URL}?action=updateStatus&row=${rowNumber}&status=${encodeURIComponent(novoStatus)}`;
-            
-            try {
-                await fetch(url, { method: 'GET', mode: 'no-cors' });
-                // Sucesso: não fazemos nada visual extra pois a caixa já mudou o texto
-            } catch (e) {
-                alert("Erro ao sincronizar status com a planilha.");
-            }
+        } catch (e) {
+            alert("Erro ao sincronizar status.");
         }
-    // Função para abrir/fechar a gaveta do checklist
-        function toggleGaveta(rowId) {
-            const gaveta = document.getElementById(rowId);
-            if (gaveta.classList.contains('hidden')) {
-                gaveta.classList.remove('hidden');
-                gaveta.classList.add('table-row'); // Exibe a linha
-            } else {
-                gaveta.classList.add('hidden');
-                gaveta.classList.remove('table-row');
-            }
+    }
+
+    function toggleGaveta(rowId) {
+        const gaveta = document.getElementById(rowId);
+        if (gaveta.classList.contains('hidden')) {
+            gaveta.classList.remove('hidden');
+            gaveta.classList.add('table-row');
+        } else {
+            gaveta.classList.add('hidden');
+            gaveta.classList.remove('table-row');
         }
+    }
 
-        // Função que salva no Google Sheets assim que você clica em um checklist
-        async function salvarChecklist(rowNumber, rowId) {
-            const gaveta = document.getElementById(rowId);
-            const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
-            
-            // Monta o objeto com o status dos 4 botões
-            const data = {
-                ferrugem: checkboxes[0].checked,
-                maresia: checkboxes[1].checked,
-                naoliga: checkboxes[2].checked,
-                poeira: checkboxes[3].checked
-            };
+    async function salvarChecklist(rowNumber, rowId) {
+        const gaveta = document.getElementById(rowId);
+        const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
+        
+        const data = {
+            ferrugem: checkboxes[0].checked,
+            maresia: checkboxes[1].checked,
+            naoliga: checkboxes[2].checked,
+            poeira: checkboxes[3].checked
+        };
 
-            const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
-            
-            try {
-                // Fica roxo para indicar que está salvando (UX feedback)
-                gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
-                
-                await fetch(url, { method: 'GET', mode: 'no-cors' });
-                
-                // Volta ao normal
-                setTimeout(() => {
-                    gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-lime-green)]');
-                }, 500);
-
-            } catch (e) {
-                alert("Erro ao salvar o checklist.");
-            }
+        const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
+        
+        try {
+            gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
+            await fetch(url, { method: 'GET', mode: 'no-cors' });
+            setTimeout(() => {
+                gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-vibrant-purple)]');
+            }, 500);
+        } catch (e) {
+            alert("Erro ao salvar o checklist.");
         }
+    }
 </script>
 </body>
 </html>
