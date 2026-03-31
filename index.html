@@ -52,9 +52,9 @@
             <div class="absolute left-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
             <div class="absolute right-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
             <h1 class="text-6xl font-extrabold tracking-tighter hmtec-lime-outline">HMTEC</h1>
-            <p class="mt-2 text-lg text-white font-medium tracking-tight">Assistencia Técnica e Comercio - SisGBin</p>
+            <p class="mt-2 text-lg text-white font-medium tracking-tight">Gestão Industrial de Bancada</p>
             <div class="mt-4 text-sm bg-black/50 px-4 py-2 rounded-full inline-block border border-[var(--hmtec-lime-green)] text-[var(--hmtec-lime-green)]">
-                Sistema de Gestão de Bancada Inteligente 
+                Aracaju / SE - Manutenção e Comercio
             </div>
         </div>
     </header>
@@ -108,7 +108,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
                         <span class="w-2 h-6 bg-[var(--hmtec-lime-green)] mr-3"></span>
-                        Computadores no Estoque
+                        Computadores na Bancada
                     </h2>
                     <div class="text-[var(--hmtec-lime-green)] text-sm font-mono bg-black/50 px-4 py-1.5 rounded-full border border-[var(--hmtec-lime-green)]">
                         STATUS: ONLINE
@@ -122,7 +122,7 @@
                                 <th class="py-3 px-4">Cliente</th>
                                 <th class="py-3 px-4">Equipamento</th>
                                 <th class="py-3 px-4">Entrada</th>
-                                <th class="py-3 px-4">Status PC</th>
+                                <th class="py-3 px-4">Status Cliente</th>
                                 <th class="py-3 px-4 text-center">Timer (SLA)</th>
                                 <th class="py-3 px-4 text-center">Ação</th>
                             </tr>
@@ -138,7 +138,7 @@
     <footer class="hmtec-geometric-pattern border-t-2 border-[#bbff00] text-gray-500 p-6 fixed bottom-0 left-0 w-full bg-[#121212]/90 backdrop-blur-sm z-10">
         <div class="container mx-auto text-center">
             <p class="text-xs">
-                Hmtec SisGBin © 2026. Todos os direitos reservados.
+                Hmtec Gestão Industrial de Bancada © 2026. Todos os direitos reservados.
                 <br>
                 Hospedagem Gratuita no GitHub. Sistema powered by GoogleSheets API.
             </p>
@@ -259,10 +259,11 @@
                             </button>
                             <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
                                     class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all text-center w-full">
-                                E-MAIL
+                                E-MAIL PREMIUM
                             </button>
                         </div>
                     </td>
+                `;
                 tableBody.appendChild(row);
 
                 const gavetaRow = document.createElement('tr');
@@ -511,7 +512,7 @@
             <body>
                 <div class="header">
                     <h1>HMTEC</h1>
-                    <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">SisGBin</p>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">Gestão Industrial de Bancada</p>
                     <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">Aracaju / SE | CNPJ: 00.000.000/0000-00</p>
                 </div>
                 
@@ -543,7 +544,7 @@
                 </div>
 
                 <div class="footer">
-                    Hmtec SisGBin © 2026. Todos os direitos reservados.<br>
+                    Hmtec Gestão Industrial de Bancada © 2026. Todos os direitos reservados.<br>
                     Hospedagem Gratuita no GitHub. Sistema powered by GoogleSheets API.
                 </div>
             </body>
