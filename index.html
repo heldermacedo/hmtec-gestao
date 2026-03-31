@@ -21,16 +21,13 @@
             min-height: 100vh;
         }
 
-        /* Efeito de Vidro (Glassmorphism) */
         .glass-card {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* TEXTURA DO MENU DE CADASTRO */
         .menu-texture {
-            /* Imagem de textura sutil (Carbon Fiber/Dark Pattern) */
             background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
             background-color: rgba(15, 15, 18, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -49,17 +46,17 @@
             outline: none;
         }
 
-        /* Botões Estilo "Registrar" (Pequenos) */
         .btn-action-minimal {
             background: white;
             color: black;
             font-size: 9px;
             font-weight: 800;
             letter-spacing: 0.1em;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .btn-action-minimal:hover {
@@ -89,7 +86,7 @@
             
             <div class="lg:col-span-1 menu-texture p-8 rounded-[2rem] shadow-2xl h-fit">
                 <h2 class="text-[10px] font-black mb-10 text-white uppercase tracking-[0.3em] flex items-center">
-                    <span class="w-1.5 h-1.5 bg-[var(--hmtec-lime)] rounded-full mr-3"></span>
+                    <span class="w-1.5 h-1.5 bg-[var(--hmtec-lime)] rounded-full mr-3 animate-pulse"></span>
                     Novo Registro
                 </h2>
                 <form id="add-pc-form" class="space-y-6">
@@ -122,19 +119,16 @@
                             <option value="0">NÃO-ACORDADO</option>
                         </select>
                     </div>
-                    
                     <button type="submit" class="w-full bg-white text-black hover:bg-[var(--hmtec-lime)] p-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all duration-500 mt-4">
-                        Registrar na Bancada
+                        Registrar
                     </button>
                 </form>
             </div>
 
             <div class="lg:col-span-3 glass-card p-10 rounded-[2rem]">
                 <div class="flex items-center justify-between mb-12">
-                    <h2 class="text-[10px] font-bold text-white uppercase tracking-[0.3em]">Monitoramento de Status</h2>
-                    <div class="text-[var(--hmtec-lime)] text-[9px] font-mono border border-[var(--hmtec-lime)]/30 px-4 py-1 rounded-full uppercase tracking-widest">
-                        Core Online
-                    </div>
+                    <h2 class="text-[10px] font-bold text-white uppercase tracking-[0.3em]">Monitoramento</h2>
+                    <div class="text-[var(--hmtec-lime)] text-[9px] font-mono border border-[var(--hmtec-lime)]/30 px-4 py-1 rounded-full uppercase tracking-widest">System Live</div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -143,14 +137,13 @@
                             <tr>
                                 <th class="pb-6 px-4">Técnico/ID</th>
                                 <th class="pb-6 px-4">Equipamento</th>
-                                <th class="pb-6 px-4">Data/Hora</th>
+                                <th class="pb-6 px-4">Entrada</th>
                                 <th class="pb-6 px-4">Status</th>
-                                <th class="pb-6 px-4 text-center">Progresso</th>
-                                <th class="pb-6 px-4 text-center">Conectar</th>
+                                <th class="pb-6 px-4 text-center">SLA</th>
+                                <th class="pb-6 px-4 text-center">Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="pc-table-body" class="text-xs">
-                            </tbody>
+                        <tbody id="pc-table-body" class="text-xs"></tbody>
                     </table>
                 </div>
             </div>
@@ -159,11 +152,10 @@
 
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
-    const form = document.getElementById('add-pc-form');
     const tableBody = document.getElementById('pc-table-body');
 
     async function loadMaintenances() {
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-[9px] tracking-[0.5em] text-gray-700">FETCHING DATA...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-[9px] tracking-[0.5em] text-gray-700">FETCHING...</td></tr>';
         try {
             const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
             const data = await response.json();
@@ -178,6 +170,7 @@
                     dataFormatada = `<span class="text-gray-200">${d[2]}/${d[1]}</span> <span class="text-[9px] text-gray-600 ml-1">${h}</span>`;
                 }
 
+                // Timer SLA
                 let slaVisual = '--';
                 if (item.sla && item.sla !== "0" && item.status !== 'Finalizado') {
                     const slaHours = parseInt(item.sla);
@@ -192,85 +185,85 @@
                     slaVisual = '<span class="text-[9px] text-[var(--hmtec-lime)] font-bold">READY</span>';
                 }
 
+                let checks = {}; try { checks = JSON.parse(item.checklist); } catch(e) {}
                 const rowId = `gaveta-${item.rowNumber}`;
                 const row = document.createElement('tr');
                 row.className = "border-b border-white/5 hover:bg-white/[0.01] transition-all cursor-pointer";
-                row.onclick = (e) => { if(!['SELECT','BUTTON'].includes(e.target.tagName)) toggleGaveta(rowId); };
+                row.onclick = (e) => { if(!['SELECT','BUTTON','TEXTAREA'].includes(e.target.tagName)) toggleGaveta(rowId); };
 
                 const statusColors = {'Aguardando Autorização':'text-yellow-500','Aguardando Peças':'text-orange-500','Aguardando Testes Finais':'text-blue-500','Finalizado':'text-[var(--hmtec-lime)]'};
+                const itemEncoded = encodeURIComponent(JSON.stringify(item));
 
                 row.innerHTML = `
-                    <td class="py-6 px-4 font-bold text-white uppercase tracking-tighter text-[11px] italic"># ${item.clientName}</td>
+                    <td class="py-6 px-4 font-bold text-white uppercase text-[11px] italic"># ${item.clientName}</td>
                     <td class="py-6 px-4 text-gray-500 text-[10px] uppercase font-light">${item.pcModel}</td>
                     <td class="py-6 px-4 font-mono text-[10px]">${dataFormatada}</td>
                     <td class="py-6 px-4">
-                        <select onchange="atualizarStatus(${item.rowNumber}, this.value, this, '${encodeURIComponent(JSON.stringify(item))}')" 
+                        <select onchange="atualizarStatus(${item.rowNumber}, this.value, this, '${itemEncoded}')" 
                                 class="bg-transparent border-none ${statusColors[item.status] || 'text-gray-500'} text-[9px] font-black uppercase tracking-widest cursor-pointer focus:outline-none">
                             ${Object.keys(statusColors).map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''} class="bg-[#0d0d0f] text-white">${s}</option>`).join('')}
                         </select>
                     </td>
                     <td class="py-6 px-4 text-center">${slaVisual}</td>
                     <td class="py-6 px-4">
-                        <div class="flex gap-2 justify-center">
-                            <button onclick="abrirWhatsApp('${item.clientPhone}', '${item.clientName}')" class="btn-action-minimal">WPP</button>
-                            <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" class="btn-action-minimal">MAIL</button>
+                        <div class="flex flex-col gap-1.5 items-center">
+                            <button onclick="abrirWhatsApp('${item.clientPhone}', '${item.clientName}')" class="btn-action-minimal w-20">WPP</button>
+                            <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" class="btn-action-minimal w-20">MAIL</button>
                         </div>
                     </td>
                 `;
                 tableBody.appendChild(row);
 
+                // GAVETA DE CHECKLIST E HISTÓRICO
                 const g = document.createElement('tr');
                 g.id = rowId; g.className = "hidden bg-white/[0.005]";
                 g.innerHTML = `<td colspan="6" class="p-10 border-b border-white/5">
-                    <div class="grid grid-cols-2 gap-16">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
                         <div>
                             <span class="text-[9px] font-black text-gray-600 tracking-[0.4em] uppercase mb-8 block">Diagnostic Checklist</span>
                             <div class="space-y-4">
-                                ${['ferrugem', 'maresia', 'naoliga', 'poeira', 'danos'].map(c => `
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks[c] ? 'checked' : ''} class="w-3 h-3 accent-[var(--hmtec-lime)] opacity-30">
-                                        <span class="text-[10px] text-gray-500 uppercase tracking-widest">${c.replace('poeira','Sujeira').replace('danos','Danos Físicos')}</span>
+                                ${Object.entries({ferrugem:'Ferrugem', maresia:'Maresia', naoliga:'Não Liga', poeira:'Sujeira', danos:'Danos Físicos'}).map(([k,v]) => `
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks[k] ? 'checked' : ''} class="w-3 h-3 accent-[var(--hmtec-lime)] opacity-30">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-widest">${v}</span>
                                     </label>
                                 `).join('')}
                             </div>
                         </div>
                         <div>
                             <span class="text-[9px] font-black text-[var(--hmtec-lime)] tracking-[0.4em] uppercase mb-8 block">Lab Report</span>
-                            <div id="historico-texto-${item.rowNumber}" class="text-[11px] text-gray-500 bg-black/40 p-6 rounded-2xl mb-4 font-mono h-32 overflow-y-auto leading-relaxed border border-white/5 italic">${item.serviceDetails}</div>
+                            <div id="historico-texto-${item.rowNumber}" class="text-[11px] text-gray-500 bg-black/40 p-6 rounded-2xl mb-4 font-mono h-32 overflow-y-auto border border-white/5 whitespace-pre-wrap">${item.serviceDetails}</div>
                             <div class="flex gap-2">
-                                <textarea id="novo-servico-${item.rowNumber}" class="w-full bg-black/60 border border-white/5 text-white p-4 text-[10px] rounded-2xl focus:border-[var(--hmtec-lime)]/30 focus:outline-none" rows="2" placeholder="ENTRY DATA..."></textarea>
-                                <button onclick="adicionarServico(${item.rowNumber})" class="bg-white text-black font-black text-[9px] px-6 rounded-2xl hover:bg-[var(--hmtec-lime)] transition-all uppercase">Add</button>
+                                <textarea id="novo-servico-${item.rowNumber}" class="w-full bg-black/60 border border-white/5 text-white p-4 text-[10px] rounded-2xl focus:border-[var(--hmtec-lime)]/30 focus:outline-none" rows="2" placeholder="ENTRADA TÉCNICA..."></textarea>
+                                <button onclick="adicionarServico(${item.rowNumber})" class="bg-white text-black font-black text-[9px] px-6 rounded-2xl hover:bg-[var(--hmtec-lime)] uppercase">Add</button>
                             </div>
                         </div>
                     </div>
                 </td>`;
                 tableBody.appendChild(g);
             });
-        } catch (e) { console.error(e); }
+        } catch (e) { tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-red-900">OFFLINE</td></tr>'; }
     }
 
-    form.addEventListener('submit', function(e) {
+    document.getElementById('add-pc-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = e.target.querySelector('button'); btn.innerText = 'SYNC...'; btn.disabled = true;
-        const d = {}; new FormData(form).forEach((v, k) => d[k] = v);
+        const d = {}; new FormData(this).forEach((v, k) => d[k] = v);
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) }).then(() => {
-            form.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
-            setTimeout(() => loadMaintenances(), 1000);
+            this.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
+            setTimeout(() => loadMaintenances(), 1500);
         });
     });
 
-    function abrirWhatsApp(t, n) { 
-        if(!t) return alert("NO NUMBER");
-        const nl = t.replace(/\D/g, ''); const nf = nl.startsWith('55') ? nl : '55'+nl;
-        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC PERFORMANCE: Olá '+n)}`, '_blank');
+    async function atualizarStatus(row, s, el, i) {
+        el.className = "bg-transparent border-none text-gray-500 text-[9px] font-black animate-pulse uppercase";
+        await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`, {mode:'no-cors'});
+        loadMaintenances();
+        if(s === 'Finalizado') {
+            const item = JSON.parse(decodeURIComponent(i));
+            gerarPDF(item, row);
+        }
     }
-
-    async function dispararEmail(e, n, m) { 
-        await fetch(`${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(e)}&name=${encodeURIComponent(n)}&model=${encodeURIComponent(m)}`, {mode:'no-cors'});
-        alert("MAIL SENT");
-    }
-
-    function toggleGaveta(id) { document.getElementById(id).classList.toggle('hidden'); }
 
     async function salvarChecklist(row, id) {
         const c = document.getElementById(id).querySelectorAll('input[type="checkbox"]');
@@ -281,19 +274,30 @@
     async function adicionarServico(row) {
         const f = document.getElementById(`novo-servico-${row}`); const h = document.getElementById(`historico-texto-${row}`);
         if(!f.value.trim()) return;
+        f.disabled = true;
         const res = await fetch(`${SCRIPT_URL}?action=updateService&row=${row}&texto=${encodeURIComponent(f.value.trim())}`);
-        const d = await res.json(); h.innerText = d.textoFinal; f.value = ""; h.scrollTop = h.scrollHeight;
+        const d = await res.json(); 
+        h.innerText = d.textoFinal; f.value = ""; f.disabled = false; h.scrollTop = h.scrollHeight;
     }
 
-    async function atualizarStatus(row, s, el, i) {
-        await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`, {mode:'no-cors'});
-        loadMaintenances();
-        if(s === 'Finalizado') {
-            const item = JSON.parse(decodeURIComponent(i));
-            const j = window.open('', '', 'width=800,height=600');
-            j.document.write(`<html><body style="font-family:sans-serif;padding:50px;"><h1>HMTEC - REPORT</h1><p>Client: ${item.clientName}</p><pre>${document.getElementById(`historico-texto-${row}`).innerText}</pre></body></html>`);
-            j.document.close(); setTimeout(() => j.print(), 500);
-        }
+    function abrirWhatsApp(t, n) { 
+        if(!t) return alert("SEM CONTATO");
+        const nl = t.replace(/\D/g, ''); const nf = nl.startsWith('55') ? nl : '55'+nl;
+        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC: Olá '+n)}`, '_blank');
+    }
+
+    async function dispararEmail(e, n, m) { 
+        await fetch(`${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(e)}&name=${encodeURIComponent(n)}&model=${encodeURIComponent(m)}`, {mode:'no-cors'});
+        alert("MAIL SENT");
+    }
+
+    function toggleGaveta(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+    function gerarPDF(item, row) {
+        const hist = document.getElementById(`historico-texto-${row}`).innerText;
+        const j = window.open('', '', 'width=800,height=600');
+        j.document.write(`<html><body style="font-family:sans-serif;padding:50px;"><h1>HMTEC - REPORT</h1><p>Client: ${item.clientName}</p><hr><pre style="white-space:pre-wrap;">${hist}</pre></body></html>`);
+        j.document.close(); setTimeout(() => j.print(), 500);
     }
 
     loadMaintenances();
