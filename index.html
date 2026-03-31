@@ -233,38 +233,42 @@
                 `;
                 tableBody.appendChild(row);
 
-                // --- 2. LINHA DA GAVETA (Checklist) ---
                 const gavetaRow = document.createElement('tr');
-                gavetaRow.id = rowId;
-                gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
-                
-                gavetaRow.innerHTML = `
-                    <td colspan="5" class="py-3 px-8">
-                        <div class="flex flex-wrap items-center gap-6">
-                            <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
-                            
-                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                                <span class="text-xs">Pontos de Ferrugem</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                                <span class="text-xs">Maresia</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                                <span class="text-xs">Não Liga</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                                <span class="text-xs">Muita Poeira / Sujeira</span>
-                            </label>
-                        </div>
-                    </td>
-                `;
+            gavetaRow.id = rowId;
+            gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
+            
+            gavetaRow.innerHTML = `
+                <td colspan="5" class="py-3 px-8">
+                    <div class="flex items-center gap-6">
+                        <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Pontos de Ferrugem</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Maresia</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Não Liga</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Muita Poeira / Sujeira</span>
+                        </label>
+
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.danos ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Danos Físicos / Riscos</span>
+                        </label>
+                    </div>
+                </td>
+            `;
                 tableBody.appendChild(gavetaRow);
             
             }); // <-- O CURTO-CIRCUITO ESTAVA AQUI! Faltava fechar o forEach.
@@ -361,28 +365,30 @@
     }
 
     async function salvarChecklist(rowNumber, rowId) {
-        const gaveta = document.getElementById(rowId);
-        const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
-        
-        const data = {
-            ferrugem: checkboxes[0].checked,
-            maresia: checkboxes[1].checked,
-            naoliga: checkboxes[2].checked,
-            poeira: checkboxes[3].checked
-        };
+            const gaveta = document.getElementById(rowId);
+            const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
+            
+            // Mapeia o status dos 5 botões (na ordem do HTML)
+            const data = {
+                ferrugem: checkboxes[0].checked,
+                maresia: checkboxes[1].checked,
+                naoliga: checkboxes[2].checked,
+                poeira: checkboxes[3].checked,
+                danos: checkboxes[4].checked // Novo item mapeado
+            };
 
-        const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
-        
-        try {
-            gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
-            await fetch(url, { method: 'GET', mode: 'no-cors' });
-            setTimeout(() => {
-                gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-vibrant-purple)]');
-            }, 500);
-        } catch (e) {
-            alert("Erro ao salvar o checklist.");
-        }
-    }
+            const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
+            
+            try {
+                gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
+                await fetch(url, { method: 'GET', mode: 'no-cors' });
+                
+                setTimeout(() => {
+                    gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-vibrant-purple)]');
+                }, 500);
+            } catch (e) {
+                alert("Erro ao salvar o checklist.");
+            }
 </script>
 </body>
 </html>
