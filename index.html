@@ -11,24 +11,20 @@
             --hmtec-lime-green: #bbff00;
             --hmtec-dark: #121212;
         }
-
         .hmtec-geometric-pattern {
             background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 20L10 0H20L10 20H0ZM20 20L30 40H40L30 20H20ZM20 0L30 20H40L30 0H20Z" fill="%23bbff00" opacity="0.1"/></svg>');
             background-size: 20px 20px;
         }
-
         .hmtec-header-effect {
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.5)), 
                         url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="1" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" fill="white" opacity="0.05"/></svg>'),
                         var(--hmtec-vibrant-purple);
             box-shadow: 0 0 100px var(--hmtec-vibrant-purple) inset;
         }
-
         .hmtec-lime-outline {
             color: var(--hmtec-dark);
             -webkit-text-stroke: 1.5px var(--hmtec-lime-green);
         }
-
         .hmtec-btn-purple {
             background-color: var(--hmtec-vibrant-purple);
             color: white;
@@ -37,7 +33,6 @@
         .hmtec-btn-purple:hover {
             box-shadow: 0 0 15px var(--hmtec-vibrant-purple);
         }
-
         .hmtec-input {
             background-color: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
@@ -56,7 +51,6 @@
         <div class="container mx-auto text-center relative">
             <div class="absolute left-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
             <div class="absolute right-0 top-0 text-[var(--hmtec-lime-green)] opacity-30 hmtec-geometric-pattern w-16 h-16"></div>
-
             <h1 class="text-6xl font-extrabold tracking-tighter hmtec-lime-outline">HMTEC</h1>
             <p class="mt-2 text-lg text-white font-medium tracking-tight">Gestão Industrial de Bancada</p>
             <div class="mt-4 text-sm bg-black/50 px-4 py-2 rounded-full inline-block border border-[var(--hmtec-lime-green)] text-[var(--hmtec-lime-green)]">
@@ -87,16 +81,16 @@
                         <input type="email" name="clientEmail" placeholder="cliente@email.com" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-400">Data de Entrada</label>
-                        <input type="date" name="entryDate" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
+                        <label class="block text-sm font-medium text-gray-400">Data e Hora de Entrada</label>
+                        <input type="datetime-local" name="entryDate" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-400">Status Inicial</label>
-                        <select name="status" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 bg-gray-900">
-                            <option value="Aguardando Autorização">Aguardando Autorização</option>
-                            <option value="Aguardando Peças">Aguardando Peças</option>
-                            <option value="Aguardando Testes Finais">Aguardando Testes Finais</option>
-                            <option value="Finalizado">Finalizado</option>
+                        <label class="block text-sm font-medium text-gray-400">Acordo de SLA (Tempo)</label>
+                        <select name="sla" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1 bg-gray-900">
+                            <option value="24">24 HORAS</option>
+                            <option value="48">48 HORAS</option>
+                            <option value="72">72 HORAS</option>
+                            <option value="0">NÃO-ACORDADO</option>
                         </select>
                     </div>
                     
@@ -125,6 +119,7 @@
                                 <th class="py-3 px-4">Equipamento</th>
                                 <th class="py-3 px-4">Entrada</th>
                                 <th class="py-3 px-4">Status Cliente</th>
+                                <th class="py-3 px-4 text-center">Timer (SLA)</th>
                                 <th class="py-3 px-4">Ação</th>
                             </tr>
                         </thead>
@@ -152,7 +147,7 @@
     const tableBody = document.getElementById('pc-table-body');
 
     async function loadMaintenances() {
-        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
         
         try {
             const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
@@ -161,16 +156,53 @@
             tableBody.innerHTML = ''; 
             
             if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Bancada vazia. Adicione um PC acima!</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Bancada vazia. Adicione um PC acima!</td></tr>';
                 return;
             }
 
             data.forEach(item => {
+                // Tratamento da Data e Hora
                 let dataFormatada = "Sem Data";
                 if (item.entryDate) {
-                    const dataApenas = item.entryDate.split('T')[0]; 
-                    const partes = dataApenas.split('-'); 
-                    if (partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                    const partes = item.entryDate.split('T');
+                    if(partes.length > 0) {
+                        const dataApenas = partes[0].split('-');
+                        const horaApenas = partes[1] ? partes[1].substring(0, 5) : ""; 
+                        if (dataApenas.length === 3) {
+                            dataFormatada = `${dataApenas[2]}/${dataApenas[1]}/${dataApenas[0]} <br><span class="text-[10px] text-gray-500">${horaApenas}</span>`;
+                        }
+                    }
+                }
+
+                // Cálculos do Timer SLA
+                let slaVisual = '<span class="text-[10px] text-gray-500 font-mono">N/A</span>';
+                if (item.sla && item.sla !== "0" && item.status !== 'Finalizado') {
+                    const slaHours = parseInt(item.sla);
+                    const entryTime = new Date(item.entryDate).getTime();
+                    const now = new Date().getTime();
+                    
+                    let percentage = 0;
+                    if (!isNaN(entryTime)) {
+                        const elapsedMs = now - entryTime;
+                        const elapsedHours = elapsedMs / (1000 * 60 * 60);
+                        percentage = Math.max(0, Math.min(100, (elapsedHours / slaHours) * 100));
+                    }
+                    
+                    // Lógica de Cores da Barrinha
+                    let barColor = 'bg-[var(--hmtec-lime-green)]';
+                    if (percentage >= 50 && percentage < 100) barColor = 'bg-yellow-400 shadow-[0_0_5px_rgba(250,204,21,0.5)]';
+                    if (percentage >= 100) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'; // Vermelho se estourar o tempo
+                    
+                    slaVisual = `
+                        <div class="flex flex-col gap-1 w-20 mx-auto">
+                            <div class="w-full bg-gray-800 rounded-full h-1.5 border border-gray-700 overflow-hidden">
+                                <div class="${barColor} h-1.5 rounded-full transition-all duration-1000" style="width: ${percentage.toFixed(0)}%"></div>
+                            </div>
+                            <span class="text-[9px] font-mono text-gray-400 text-center">${percentage.toFixed(0)}% de ${item.sla}h</span>
+                        </div>
+                    `;
+                } else if (item.status === 'Finalizado') {
+                    slaVisual = '<span class="text-[10px] text-[var(--hmtec-lime-green)] font-bold">CONCLUÍDO</span>';
                 }
 
                 let checks = {};
@@ -178,7 +210,6 @@
 
                 const rowId = `gaveta-${item.rowNumber}`;
 
-                // --- 1. LINHA PRINCIPAL ---
                 const row = document.createElement('tr');
                 row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer group";
                 
@@ -201,9 +232,9 @@
                 });
                 let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
 
-                // Codifica o item para passar pro PDF
                 const itemCodificado = encodeURIComponent(JSON.stringify(item));
 
+                // Agora a linha tem 6 colunas, o SLA entra na posição 5
                 row.innerHTML = `
                     <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative whitespace-nowrap">
                         <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
@@ -217,6 +248,9 @@
                             ${opcoesHTML}
                         </select>
                     </td>
+                    <td class="py-4 px-4 text-center">
+                        ${slaVisual}
+                    </td>
                     <td class="py-4 px-4">
                         <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
                                 class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2 whitespace-nowrap">
@@ -226,13 +260,13 @@
                 `;
                 tableBody.appendChild(row);
 
-                // --- 2. LINHA DA GAVETA (Histórico e Checklist) ---
                 const gavetaRow = document.createElement('tr');
                 gavetaRow.id = rowId;
                 gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
                 
+                // colspan ajustado para 6
                 gavetaRow.innerHTML = `
-                    <td colspan="5" class="py-4 px-8">
+                    <td colspan="6" class="py-4 px-8">
                         <div class="flex flex-wrap items-center gap-6 mb-4">
                             <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
                             
@@ -278,7 +312,7 @@
 
         } catch (error) {
             console.error("Erro técnico:", error);
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de conexão com a planilha.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de conexão com a planilha.</td></tr>';
         }
     }
 
