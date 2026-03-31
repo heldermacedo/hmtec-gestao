@@ -73,6 +73,10 @@
                         <input type="text" name="clientName" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-400">WhatsApp / Contato</label>
+                        <input type="tel" name="clientPhone" placeholder="79 99999-9999" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-400">Modelo / Setup do PC</label>
                         <input type="text" name="pcModel" placeholder="i7 12ª / 16GB / RTX 3060" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
@@ -120,7 +124,7 @@
                                 <th class="py-3 px-4">Entrada</th>
                                 <th class="py-3 px-4">Status Cliente</th>
                                 <th class="py-3 px-4 text-center">Timer (SLA)</th>
-                                <th class="py-3 px-4">Ação</th>
+                                <th class="py-3 px-4 text-center">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="pc-table-body">
@@ -161,7 +165,6 @@
             }
 
             data.forEach(item => {
-                // Tratamento da Data e Hora
                 let dataFormatada = "Sem Data";
                 if (item.entryDate) {
                     const partes = item.entryDate.split('T');
@@ -174,7 +177,6 @@
                     }
                 }
 
-                // Cálculos do Timer SLA
                 let slaVisual = '<span class="text-[10px] text-gray-500 font-mono">N/A</span>';
                 if (item.sla && item.sla !== "0" && item.status !== 'Finalizado') {
                     const slaHours = parseInt(item.sla);
@@ -188,10 +190,9 @@
                         percentage = Math.max(0, Math.min(100, (elapsedHours / slaHours) * 100));
                     }
                     
-                    // Lógica de Cores da Barrinha
                     let barColor = 'bg-[var(--hmtec-lime-green)]';
                     if (percentage >= 50 && percentage < 100) barColor = 'bg-yellow-400 shadow-[0_0_5px_rgba(250,204,21,0.5)]';
-                    if (percentage >= 100) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'; // Vermelho se estourar o tempo
+                    if (percentage >= 100) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'; 
                     
                     slaVisual = `
                         <div class="flex flex-col gap-1 w-20 mx-auto">
@@ -214,7 +215,7 @@
                 row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer group";
                 
                 row.onclick = (e) => {
-                    if(e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+                    if(e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
                     toggleGaveta(rowId);
                 };
 
@@ -234,7 +235,6 @@
 
                 const itemCodificado = encodeURIComponent(JSON.stringify(item));
 
-                // Agora a linha tem 6 colunas, o SLA entra na posição 5
                 row.innerHTML = `
                     <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative whitespace-nowrap">
                         <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
@@ -252,10 +252,17 @@
                         ${slaVisual}
                     </td>
                     <td class="py-4 px-4">
-                        <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
-                                class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2 whitespace-nowrap">
-                            E-MAIL PREMIUM
-                        </button>
+                        <div class="flex flex-col gap-1.5">
+                            <button onclick="abrirWhatsApp('${item.clientPhone}', '${item.clientName}')" 
+                                    class="bg-green-600 text-white px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-green-500 transition-all flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.315 0-4.328 1.237-5.374 3.079l2.711 1.564c.731-1.288 2.133-2.143 3.663-2.143 2.146 0 3.886 1.74 3.886 3.886 0 1.53-.855 2.932-2.143 3.663l-1.564 2.711c1.842 1.046 3.079 3.059 3.079 5.374 0 2.315-1.237 4.328-3.079 5.374l-2.711-1.564c1.288-.731 2.143-2.133 2.143-3.663 0-1.53-.855-2.932-2.143-3.663l1.564-2.711c-1.842-1.046-3.079-3.059-3.079-5.374 0-2.315 1.237-4.328 3.079-5.374l2.711 1.564c-.731 1.288-2.133 2.143-3.663 2.143-2.146 0-3.886-1.74-3.886-3.886 0-1.53.855-2.932 2.143-3.663l-1.564 2.711c-1.842-1.046-3.079-3.059-3.079-5.374z"></path></svg>
+                                WHATSAPP
+                            </button>
+                            <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
+                                    class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all text-center">
+                                E-MAIL PREMIUM
+                            </button>
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -264,7 +271,6 @@
                 gavetaRow.id = rowId;
                 gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
                 
-                // colspan ajustado para 6
                 gavetaRow.innerHTML = `
                     <td colspan="6" class="py-4 px-8">
                         <div class="flex flex-wrap items-center gap-6 mb-4">
@@ -352,6 +358,23 @@
     // ==========================================
     // FUNÇÕES GLOBAIS
     // ==========================================
+    
+    // Função nova que limpa o número e abre o WhatsApp Web
+    function abrirWhatsApp(telefone, nome) {
+        if (!telefone || telefone === 'undefined' || telefone.trim() === '') {
+            alert("WhatsApp não cadastrado para este cliente.");
+            return;
+        }
+        
+        // Remove espaços, parênteses e traços
+        const numeroLimpo = telefone.replace(/\D/g, '');
+        
+        // Adiciona o código do Brasil (55) caso o usuário não tenha digitado
+        const numeroFinal = numeroLimpo.startsWith('55') ? numeroLimpo : '55' + numeroLimpo;
+        
+        const mensagem = encodeURIComponent(`Olá, ${nome}! Aqui é da HMTEC. Estamos com atualizações sobre o seu equipamento.`);
+        window.open(`https://wa.me/${numeroFinal}?text=${mensagem}`, '_blank');
+    }
 
     async function dispararEmail(email, name, model) {
         if (!email || email === 'undefined') {
