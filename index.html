@@ -174,6 +174,13 @@
         }
 
         data.forEach(item => {
+
+            const btnEmail = `
+    <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
+            class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
+        ENVIAR E-MAIL PREMIUM
+    </button>
+`;
             const row = document.createElement('tr');
             row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
             const msg = encodeURIComponent(`Olá ${item.clientName}, aqui é a Hmtec! Atualização sobre o seu ${item.pcModel}...`);
@@ -237,6 +244,20 @@
 
     // Carrega os dados ao abrir o site
     loadMaintenances();
+
+    async function dispararEmail(email, name, model) {
+    if (!email) {
+        alert("E-mail não cadastrado para este cliente.");
+        return;
+    }
+    const url = `${SCRIPT_URL}?action=sendEmail&email=${email}&name=${name}&model=${model}`;
+    try {
+        await fetch(url);
+        alert(`E-mail enviado com sucesso para ${name}!`);
+    } catch (e) {
+        alert("Erro ao disparar o e-mail.");
+    }
+}
 </script>
 </body>
 </html>
