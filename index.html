@@ -159,38 +159,43 @@
 
     // Função para buscar dados da Planilha
     async function loadMaintenances() {
-        tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Carregando bancada...</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
+    
+    try {
+        // Adicionamos um timestamp no final para evitar que o navegador use o cache antigo
+        const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
+        const data = await response.json();
         
-        try {
-            const response = await fetch(SCRIPT_URL);
-            const data = await response.json();
-            
-            tableBody.innerHTML = ''; // Limpa a tabela
-            
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
-                
-                // Formata a mensagem do WhatsApp baseada no cliente
-                const msg = encodeURIComponent(`Olá ${item.clientName}, aqui é a Hmtec de Aracaju! Passando para informar sobre a manutenção do seu ${item.pcModel}: ${item.serviceDetails}`);
-                
-                row.innerHTML = `
-                    <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
-                    <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
-                    <td class="py-4 px-4 text-gray-400">${item.entryDate}</td>
-                    <td class="py-4 px-4">
-                        <a href="https://wa.me/5579999999999?text=${msg}" target="_blank" 
-                           class="bg-[var(--hmtec-vibrant-purple)] text-white px-3 py-1 rounded-md text-xs font-bold hover:brightness-125 transition-all">
-                           NOTIFICAR
-                        </a>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        } catch (error) {
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Erro ao conectar com a API.</td></tr>';
+        tableBody.innerHTML = ''; 
+        
+        if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Bancada vazia. Adicione um PC acima!</td></tr>';
+            return;
         }
+
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
+            const msg = encodeURIComponent(`Olá ${item.clientName}, aqui é a Hmtec! Atualização sobre o seu ${item.pcModel}...`);
+            
+            row.innerHTML = `
+                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
+                <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
+                <td class="py-4 px-4 text-gray-400">${item.entryDate}</td>
+                <td class="py-4 px-4">
+                    <a href="https://wa.me/5579999999999?text=${msg}" target="_blank" 
+                       class="bg-[var(--hmtec-vibrant-purple)] text-white px-3 py-1 rounded-md text-xs font-bold hover:shadow-[0_0_10px_#6c5ce7] transition-all">
+                       NOTIFICAR
+                    </a>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Erro técnico:", error);
+        tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de link ou permissão no Google.</td></tr>';
     }
+}
 
     // Função para enviar dados para a Planilha
     form.addEventListener('submit', function(e) {
