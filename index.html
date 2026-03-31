@@ -6,20 +6,17 @@
     <title>HMTEC - Gestão de Manutenção de PCs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Cores Customizadas baseadas nas imagens da Hmtec */
         :root {
             --hmtec-vibrant-purple: #6c5ce7;
             --hmtec-lime-green: #bbff00;
             --hmtec-dark: #121212;
         }
 
-        /* Padrão geométrico */
         .hmtec-geometric-pattern {
             background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 20L10 0H20L10 20H0ZM20 20L30 40H40L30 20H20ZM20 0L30 20H40L30 0H20Z" fill="%23bbff00" opacity="0.1"/></svg>');
             background-size: 20px 20px;
         }
 
-        /* Efeito do cabeçalho */
         .hmtec-header-effect {
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.5)), 
                         url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="1" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" fill="white" opacity="0.05"/></svg>'),
@@ -90,10 +87,6 @@
                         <input type="email" name="clientEmail" placeholder="cliente@email.com" class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-400">Serviço Realizado</label>
-                        <textarea name="serviceDetails" required class="w-full hmtec-input mt-1 p-3 rounded-xl h-24 focus:ring-1"></textarea>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-400">Data de Entrada</label>
                         <input type="date" name="entryDate" required class="w-full hmtec-input mt-1 p-3 rounded-xl focus:ring-1">
                     </div>
@@ -129,7 +122,7 @@
                         <thead class="text-gray-400 uppercase border-b border-gray-700">
                             <tr>
                                 <th class="py-3 px-4">Cliente</th>
-                                <th class="py-3 px-4">Serviço</th>
+                                <th class="py-3 px-4">Equipamento</th>
                                 <th class="py-3 px-4">Entrada</th>
                                 <th class="py-3 px-4">Status Cliente</th>
                                 <th class="py-3 px-4">Ação</th>
@@ -158,7 +151,6 @@
     const form = document.getElementById('add-pc-form');
     const tableBody = document.getElementById('pc-table-body');
 
-    // Função para buscar dados da Planilha
     async function loadMaintenances() {
         tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 animate-pulse">Sincronizando com a nuvem HMTEC...</td></tr>';
         
@@ -174,7 +166,6 @@
             }
 
             data.forEach(item => {
-                // Tratamento da Data
                 let dataFormatada = "Sem Data";
                 if (item.entryDate) {
                     const dataApenas = item.entryDate.split('T')[0]; 
@@ -182,7 +173,6 @@
                     if (partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
                 }
 
-                // Tratamento do Checklist
                 let checks = {};
                 try { checks = JSON.parse(item.checklist); } catch(e) {}
 
@@ -211,15 +201,18 @@
                 });
                 let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
 
+                // Codifica o item para passar pro PDF
+                const itemCodificado = encodeURIComponent(JSON.stringify(item));
+
                 row.innerHTML = `
                     <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative whitespace-nowrap">
                         <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
                         ${item.clientName}
                     </td>
-                    <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
+                    <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-[10px] text-gray-500 italic">Clique para ver o histórico</span></td>
                     <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
                     <td class="py-4 px-4">
-                        <select onchange="atualizarStatus(${item.rowNumber}, this.value, this)" 
+                        <select onchange="atualizarStatus(${item.rowNumber}, this.value, this, '${itemCodificado}')" 
                                 class="bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full">
                             ${opcoesHTML}
                         </select>
@@ -233,45 +226,55 @@
                 `;
                 tableBody.appendChild(row);
 
+                // --- 2. LINHA DA GAVETA (Histórico e Checklist) ---
                 const gavetaRow = document.createElement('tr');
-            gavetaRow.id = rowId;
-            gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
-            
-            gavetaRow.innerHTML = `
-                <td colspan="5" class="py-3 px-8">
-                    <div class="flex items-center gap-6">
-                        <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Pontos de Ferrugem</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Maresia</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Não Liga</span>
-                        </label>
-                        
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Muita Poeira / Sujeira</span>
-                        </label>
+                gavetaRow.id = rowId;
+                gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; 
+                
+                gavetaRow.innerHTML = `
+                    <td colspan="5" class="py-4 px-8">
+                        <div class="flex flex-wrap items-center gap-6 mb-4">
+                            <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
+                            
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Pontos de Ferrugem</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Maresia</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Não Liga</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Muita Poeira / Sujeira</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                                <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.danos ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                                <span class="text-xs">Danos Físicos / Riscos</span>
+                            </label>
+                        </div>
 
-                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
-                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.danos ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
-                            <span class="text-xs">Danos Físicos / Riscos</span>
-                        </label>
-                    </div>
-                </td>
-            `;
+                        <div class="mt-4 pt-4 border-t border-gray-800">
+                            <span class="text-[10px] font-bold text-[var(--hmtec-lime-green)] tracking-widest uppercase mb-2 block">Histórico de Serviços Realizados:</span>
+                            
+                            <div id="historico-texto-${item.rowNumber}" class="text-xs text-gray-300 bg-gray-900/50 p-3 rounded border border-gray-800 mb-3 whitespace-pre-wrap font-mono h-32 overflow-y-auto">${item.serviceDetails}</div>
+                            
+                            <div class="flex gap-2">
+                                <textarea id="novo-servico-${item.rowNumber}" class="w-full bg-transparent border border-gray-700 text-white p-2 text-xs rounded focus:border-[var(--hmtec-lime-green)] focus:outline-none" rows="2" placeholder="Digite uma nova anotação ou diagnóstico..."></textarea>
+                                <div class="flex flex-col gap-1 w-32">
+                                    <button onclick="adicionarServico(${item.rowNumber})" class="bg-[var(--hmtec-lime-green)] text-black font-bold text-[10px] px-2 py-2 rounded hover:brightness-110 transition-all">INSERIR</button>
+                                    <button onclick="toggleGaveta('${rowId}')" class="bg-gray-800 text-gray-400 font-bold text-[10px] px-2 py-1 rounded hover:bg-red-900/80 hover:text-red-200 transition-all">CANCELAR</button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                `;
                 tableBody.appendChild(gavetaRow);
-            
-            }); // <-- O CURTO-CIRCUITO ESTAVA AQUI! Faltava fechar o forEach.
+            });
 
         } catch (error) {
             console.error("Erro técnico:", error);
@@ -279,7 +282,6 @@
         }
     }
 
-    // Função para enviar dados para a Planilha
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = e.target.querySelector('button');
@@ -293,9 +295,7 @@
         fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            headers: {
-                'Content-Type': 'text/plain',
-            },
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(data)
         })
         .then(() => {
@@ -306,17 +306,19 @@
             setTimeout(() => loadMaintenances(), 1500);
         })
         .catch(error => {
-            console.error("Erro técnico:", error);
+            console.error("Erro:", error);
             alert('Erro ao conectar.');
             btn.innerText = 'Cadastrar na Bancada';
             btn.disabled = false;
         });
     });
 
-    // Inicia a aplicação
     loadMaintenances();
 
-    // Funções auxiliares (Globais)
+    // ==========================================
+    // FUNÇÕES GLOBAIS
+    // ==========================================
+
     async function dispararEmail(email, name, model) {
         if (!email || email === 'undefined') {
             alert("E-mail não cadastrado para este cliente.");
@@ -332,27 +334,6 @@
         }
     }
 
-    async function atualizarStatus(rowNumber, novoStatus, selectElement) {
-        selectElement.className = "bg-gray-800 border border-gray-500 text-gray-400 font-bold text-xs p-2 rounded cursor-wait w-full";
-        const url = `${SCRIPT_URL}?action=updateStatus&row=${rowNumber}&status=${encodeURIComponent(novoStatus)}`;
-        try {
-            await fetch(url, { method: 'GET', mode: 'no-cors' });
-            
-            // Retorna as cores dependendo do status
-            const opcoesStatus = [
-                { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
-                { nome: 'Aguardando Peças', cor: 'text-orange-400' },
-                { nome: 'Aguardando Testes Finais', cor: 'text-blue-400' },
-                { nome: 'Finalizado', cor: 'text-[var(--hmtec-lime-green)]' }
-            ];
-            let corAtual = opcoesStatus.find(o => o.nome === novoStatus)?.cor || 'text-white';
-            selectElement.className = `bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full`;
-
-        } catch (e) {
-            alert("Erro ao sincronizar status.");
-        }
-    }
-
     function toggleGaveta(rowId) {
         const gaveta = document.getElementById(rowId);
         if (gaveta.classList.contains('hidden')) {
@@ -365,30 +346,161 @@
     }
 
     async function salvarChecklist(rowNumber, rowId) {
-            const gaveta = document.getElementById(rowId);
-            const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
-            
-            // Mapeia o status dos 5 botões (na ordem do HTML)
-            const data = {
-                ferrugem: checkboxes[0].checked,
-                maresia: checkboxes[1].checked,
-                naoliga: checkboxes[2].checked,
-                poeira: checkboxes[3].checked,
-                danos: checkboxes[4].checked // Novo item mapeado
-            };
+        const gaveta = document.getElementById(rowId);
+        const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
+        
+        const data = {
+            ferrugem: checkboxes[0].checked,
+            maresia: checkboxes[1].checked,
+            naoliga: checkboxes[2].checked,
+            poeira: checkboxes[3].checked,
+            danos: checkboxes[4].checked
+        };
 
-            const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
+        const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
+        
+        try {
+            gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
+            await fetch(url, { method: 'GET', mode: 'no-cors' });
+            setTimeout(() => {
+                gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-vibrant-purple)]');
+            }, 500);
+        } catch (e) {
+            alert("Erro ao salvar o checklist.");
+        }
+    }
+
+    async function adicionarServico(rowNumber) {
+        const campoTexto = document.getElementById(`novo-servico-${rowNumber}`);
+        const areaHistorico = document.getElementById(`historico-texto-${rowNumber}`);
+        const novoTexto = campoTexto.value.trim();
+
+        if(!novoTexto) return;
+
+        campoTexto.disabled = true;
+        campoTexto.value = "Salvando na planilha...";
+
+        const url = `${SCRIPT_URL}?action=updateService&row=${rowNumber}&texto=${encodeURIComponent(novoTexto)}`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
             
-            try {
-                gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
-                await fetch(url, { method: 'GET', mode: 'no-cors' });
-                
-                setTimeout(() => {
-                    gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-vibrant-purple)]');
-                }, 500);
-            } catch (e) {
-                alert("Erro ao salvar o checklist.");
+            areaHistorico.innerText = data.textoFinal;
+            campoTexto.value = "";
+            campoTexto.disabled = false;
+            areaHistorico.scrollTop = areaHistorico.scrollHeight;
+        } catch(e) {
+            alert("Erro ao inserir anotação.");
+            campoTexto.disabled = false;
+        }
+    }
+
+    async function atualizarStatus(rowNumber, novoStatus, selectElement, itemString) {
+        selectElement.className = "bg-gray-800 border border-gray-500 text-gray-400 font-bold text-xs p-2 rounded cursor-wait w-full";
+        const url = `${SCRIPT_URL}?action=updateStatus&row=${rowNumber}&status=${encodeURIComponent(novoStatus)}`;
+        
+        try {
+            await fetch(url, { method: 'GET', mode: 'no-cors' });
+            
+            const opcoesStatus = [
+                { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
+                { nome: 'Aguardando Peças', cor: 'text-orange-400' },
+                { nome: 'Aguardando Testes Finais', cor: 'text-blue-400' },
+                { nome: 'Finalizado', cor: 'text-[var(--hmtec-lime-green)]' }
+            ];
+            let corAtual = opcoesStatus.find(o => o.nome === novoStatus)?.cor || 'text-white';
+            selectElement.className = `bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full`;
+
+            if (novoStatus === 'Finalizado' && itemString) {
+                const itemData = JSON.parse(decodeURIComponent(itemString));
+                gerarOrdemDeServicoPDF(itemData, rowNumber);
             }
+
+        } catch (e) {
+            alert("Erro ao sincronizar status.");
+        }
+    }
+
+    function gerarOrdemDeServicoPDF(item, rowNumber) {
+        const historicoAtualizado = document.getElementById(`historico-texto-${rowNumber}`).innerText;
+        
+        let checks = {};
+        try { checks = JSON.parse(item.checklist); } catch(e) {}
+        const checkText = [];
+        if(checks.ferrugem) checkText.push("Pontos de Ferrugem");
+        if(checks.maresia) checkText.push("Maresia");
+        if(checks.naoliga) checkText.push("Não Liga");
+        if(checks.poeira) checkText.push("Muita Poeira / Sujeira");
+        if(checks.danos) checkText.push("Danos Físicos / Riscos");
+        const checklistStr = checkText.length > 0 ? checkText.join(", ") : "Equipamento recebido sem avarias aparentes.";
+
+        const conteudoHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>OS_HMTEC_${item.clientName}</title>
+                <style>
+                    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #111; max-width: 800px; margin: auto; }
+                    .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                    h1 { margin: 0; font-size: 32px; letter-spacing: -1px; }
+                    .info-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+                    .section { margin-bottom: 25px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+                    .section-title { background-color: #eee; padding: 10px 15px; margin: 0; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #ccc; font-weight: bold; }
+                    .section-content { padding: 15px; font-size: 14px; line-height: 1.6; }
+                    pre { white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 13px; color: #333; margin: 0; }
+                    .status-final { text-align: center; background-color: #000; color: #fff; padding: 15px; font-weight: bold; font-size: 18px; letter-spacing: 2px; }
+                    .footer { margin-top: 50px; text-align: center; font-size: 10px; color: #888; border-top: 1px solid #eee; padding-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>HMTEC</h1>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">Gestão Industrial de Bancada</p>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">Aracaju / SE | CNPJ: 00.000.000/0000-00</p>
+                </div>
+                
+                <div class="info-grid">
+                    <div>
+                        <strong>Cliente:</strong> ${item.clientName}<br>
+                        <strong>Equipamento:</strong> ${item.pcModel}
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>Data de Entrada:</strong> ${item.entryDate.split('T')[0].split('-').reverse().join('/')}<br>
+                        <strong>Laudo Gerado em:</strong> ${new Date().toLocaleDateString('pt-BR')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Checklist de Entrada Bancada</div>
+                    <div class="section-content">${checklistStr}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Histórico e Procedimentos Técnicos Realizados</div>
+                    <div class="section-content">
+                        <pre>${historicoAtualizado}</pre>
+                    </div>
+                </div>
+
+                <div class="section" style="border: none;">
+                    <div class="status-final">STATUS: FINALIZADO</div>
+                </div>
+
+                <div class="footer">
+                    Hmtec Gestão Industrial de Bancada © 2026. Todos os direitos reservados.<br>
+                    Hospedagem Gratuita no GitHub. Sistema powered by GoogleSheets API.
+                </div>
+            </body>
+            </html>
+        `;
+
+        const janela = window.open('', '', 'width=900,height=700');
+        janela.document.write(conteudoHTML);
+        janela.document.close();
+        janela.focus();
+        setTimeout(() => { janela.print(); }, 500);
+    }
 </script>
 </body>
 </html>
