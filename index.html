@@ -190,20 +190,30 @@
         }
 
         data.forEach(item => {
-            // Tratamento da Data
+           // Tratamento da Data
             let dataFormatada = "Sem Data";
             if (item.entryDate) {
                 const dataApenas = item.entryDate.split('T')[0]; 
                 const partes = dataApenas.split('-'); 
-                if (partes.length === 3) {
-                    dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
-                }
+                if (partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; 
             }
 
+            // Tratamento do Checklist (lê o que veio do Google)
+            let checks = {};
+            try { checks = JSON.parse(item.checklist); } catch(e) {}
+
+            const rowId = `gaveta-${item.rowNumber}`;
+
+            // --- 1. LINHA PRINCIPAL (Onde você clica) ---
             const row = document.createElement('tr');
-            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
+            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer group";
             
-            // --- INÍCIO DA NOVA COLUNA DE STATUS ---
+            // Lógica para que ao clicar no botão ou select, a gaveta NÃO abra/feche sem querer
+            row.onclick = (e) => {
+                if(e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+                toggleGaveta(rowId);
+            };
+
             const opcoesStatus = [
                 { nome: 'Aguardando Autorização', cor: 'text-yellow-400' },
                 { nome: 'Aguardando Peças', cor: 'text-orange-400' },
@@ -216,32 +226,63 @@
                 let selecionado = item.status === opt.nome ? 'selected' : '';
                 opcoesHTML += `<option value="${opt.nome}" ${selecionado} class="bg-gray-900 text-white">${opt.nome}</option>`;
             });
-
             let corAtual = opcoesStatus.find(o => o.nome === item.status)?.cor || 'text-gray-400';
-            // --- FIM DA LÓGICA DE STATUS ---
 
-            // Montando as 5 colunas (Cliente, Serviço, Entrada, Status, Ação)
             row.innerHTML = `
-                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
+                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)] relative">
+                    <span class="text-xs text-gray-600 mr-2 group-hover:text-white transition-colors">▼</span>
+                    ${item.clientName}
+                </td>
                 <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
                 <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
-                
                 <td class="py-4 px-4">
                     <select onchange="atualizarStatus(${item.rowNumber}, this.value, this)" 
                             class="bg-gray-800 border border-gray-700 ${corAtual} font-bold text-xs p-2 rounded cursor-pointer focus:outline-none focus:border-[var(--hmtec-lime-green)] w-full">
                         ${opcoesHTML}
                     </select>
                 </td>
-                
                 <td class="py-4 px-4">
                     <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
                             class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
-                        ENVIAR E-MAIL
+                        E-MAIL PREMIUM
                     </button>
                 </td>
             `;
             tableBody.appendChild(row);
-        });
+
+            // --- 2. LINHA DA GAVETA (O Checklist escondido) ---
+            const gavetaRow = document.createElement('tr');
+            gavetaRow.id = rowId;
+            gavetaRow.className = "hidden bg-[#0a0a0a] border-b border-[var(--hmtec-vibrant-purple)] shadow-inner"; // Fundo mais escuro com detalhe roxo
+            
+            gavetaRow.innerHTML = `
+                <td colspan="5" class="py-3 px-8">
+                    <div class="flex items-center gap-6">
+                        <span class="text-[10px] font-bold text-[var(--hmtec-vibrant-purple)] tracking-widest uppercase">Checklist Bancada:</span>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.ferrugem ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Pontos de Ferrugem</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.maresia ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Maresia</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.naoliga ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Não Liga</span>
+                        </label>
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer hover:text-white text-gray-400 transition-colors">
+                            <input type="checkbox" onchange="salvarChecklist(${item.rowNumber}, '${rowId}')" ${checks.poeira ? 'checked' : ''} class="w-4 h-4 accent-[var(--hmtec-lime-green)]">
+                            <span class="text-xs">Muita Poeira / Sujeira</span>
+                        </label>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(gavetaRow);
     } catch (error) {
         console.error("Erro técnico:", error);
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de link ou permissão no Google.</td></tr>';
@@ -315,7 +356,48 @@
                 alert("Erro ao sincronizar status com a planilha.");
             }
         }
-    
+    // Função para abrir/fechar a gaveta do checklist
+        function toggleGaveta(rowId) {
+            const gaveta = document.getElementById(rowId);
+            if (gaveta.classList.contains('hidden')) {
+                gaveta.classList.remove('hidden');
+                gaveta.classList.add('table-row'); // Exibe a linha
+            } else {
+                gaveta.classList.add('hidden');
+                gaveta.classList.remove('table-row');
+            }
+        }
+
+        // Função que salva no Google Sheets assim que você clica em um checklist
+        async function salvarChecklist(rowNumber, rowId) {
+            const gaveta = document.getElementById(rowId);
+            const checkboxes = gaveta.querySelectorAll('input[type="checkbox"]');
+            
+            // Monta o objeto com o status dos 4 botões
+            const data = {
+                ferrugem: checkboxes[0].checked,
+                maresia: checkboxes[1].checked,
+                naoliga: checkboxes[2].checked,
+                poeira: checkboxes[3].checked
+            };
+
+            const url = `${SCRIPT_URL}?action=updateChecklist&row=${rowNumber}&checklist=${encodeURIComponent(JSON.stringify(data))}`;
+            
+            try {
+                // Fica roxo para indicar que está salvando (UX feedback)
+                gaveta.classList.replace('border-[var(--hmtec-vibrant-purple)]', 'border-yellow-400'); 
+                
+                await fetch(url, { method: 'GET', mode: 'no-cors' });
+                
+                // Volta ao normal
+                setTimeout(() => {
+                    gaveta.classList.replace('border-yellow-400', 'border-[var(--hmtec-lime-green)]');
+                }, 500);
+
+            } catch (e) {
+                alert("Erro ao salvar o checklist.");
+            }
+        }
 </script>
 </body>
 </html>
