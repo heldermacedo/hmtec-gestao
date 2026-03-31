@@ -174,30 +174,35 @@
         }
 
         data.forEach(item => {
+    // 1. Tratamento da Data: Converte de ISO para DD/MM/AAAA
+    let dataFormatada = "Sem Data";
+    if (item.entryDate) {
+        // Separa a string no "T" e pega apenas a parte da data "YYYY-MM-DD"
+        const dataApenas = item.entryDate.split('T')[0]; 
+        const partes = dataApenas.split('-'); // Quebra em [Ano, Mês, Dia]
+        if (partes.length === 3) {
+            dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`; // Monta como Dia/Mês/Ano
+        }
+    }
 
-            const btnEmail = `
-    <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
-            class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
-        ENVIAR E-MAIL PREMIUM
-    </button>
-`;
-            const row = document.createElement('tr');
-            row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
-            const msg = encodeURIComponent(`Olá ${item.clientName}, aqui é a Hmtec! Atualização sobre o seu ${item.pcModel}...`);
-            
-            row.innerHTML = `
-                <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
-                <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
-                <td class="py-4 px-4 text-gray-400">${item.entryDate}</td>
-                <td class="py-4 px-4">
-                    <a href="https://wa.me/5579999999999?text=${msg}" target="_blank" 
-                       class="bg-[var(--hmtec-vibrant-purple)] text-white px-3 py-1 rounded-md text-xs font-bold hover:shadow-[0_0_10px_#6c5ce7] transition-all">
-                       NOTIFICAR
-                    </a>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
+    // 2. Criação da Linha
+    const row = document.createElement('tr');
+    row.className = "border-b border-gray-800 hover:bg-gray-800/50 transition-colors";
+    
+    // Note que substituímos ${item.entryDate} por ${dataFormatada} na coluna de Entrada
+    row.innerHTML = `
+        <td class="py-4 px-4 font-bold text-[var(--hmtec-lime-green)]">${item.clientName}</td>
+        <td class="py-4 px-4 text-gray-300 text-xs">${item.pcModel} <br> <span class="text-gray-500">${item.serviceDetails}</span></td>
+        <td class="py-4 px-4 text-gray-400 font-mono text-sm">${dataFormatada}</td>
+        <td class="py-4 px-4">
+            <button onclick="dispararEmail('${item.clientEmail}', '${item.clientName}', '${item.pcModel}')" 
+                    class="bg-blue-600 text-white px-3 py-1 rounded-md text-[10px] font-bold hover:bg-blue-500 transition-all ml-2">
+                ENVIAR E-MAIL PREMIUM
+            </button>
+        </td>
+    `;
+    tableBody.appendChild(row);
+});
     } catch (error) {
         console.error("Erro técnico:", error);
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500 font-mono">DEBUG: Falha de link ou permissão no Google.</td></tr>';
