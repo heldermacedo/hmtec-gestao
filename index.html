@@ -117,8 +117,8 @@
                                 <th class="pb-6 px-4">Cliente</th>
                                 <th class="pb-6 px-4">Equipamento</th>
                                 <th class="pb-6 px-4">Data/Hora</th>
-                                <th class="pb-6 px-4">Status</th>
-                                <th class="pb-6 px-4 text-center">Progresso</th>
+                                <th class="pb-6 px-4">Status Atual</th>
+                                <th class="pb-6 px-4 text-center">Timer Sla</th>
                                 <th class="pb-6 px-4 text-center">Ação</th>
                             </tr>
                         </thead>
@@ -166,7 +166,7 @@
                     if (p >= 100) color = 'bg-red-600/80';
                     slaVisual = `<div class="w-16 mx-auto bg-white/5 h-1 rounded-full overflow-hidden"><div class="${color} h-full" style="width: ${p}%"></div></div>`;
                 } else if (item.status === 'Finalizado') {
-                    slaVisual = '<span class="text-[9px] text-[var(--hmtec-lime)] font-bold">READY</span>';
+                    slaVisual = '<span class="text-[9px] text-[var(--hmtec-lime)] font-bold">PRONTO</span>';
                 }
 
                 const rowId = `gaveta-${item.rowNumber}`;
