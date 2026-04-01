@@ -40,7 +40,6 @@
             transition: all 0.3s ease;
         }
 
-        /* CORREÇÃO DO ÍCONE DE DATA (Calendário Branco) */
         input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
@@ -62,25 +61,24 @@
         }
 
         .btn-action-minimal:hover { background: var(--hmtec-lime); transform: translateY(-1px); }
-        .glow-text { text-shadow: 0 0 20px rgba(187, 255, 0, 0.2); }
+        .glow-text { text-shadow: 0 0 30px rgba(187, 255, 0, 0.35); }
         
         .show-gaveta { display: table-row !important; }
 
-        /* Ajuste de Nitidez dos Textos */
-        .text-label { color: #a1a1aa; font-weight: 600; } /* Cinza mais claro para labels */
-        .text-checklist { color: #e4e4e7; font-weight: 500; } /* Quase branco para o checklist */
+        .text-label { color: #a1a1aa; font-weight: 600; }
+        .text-checklist { color: #e4e4e7; font-weight: 500; }
     </style>
 </head>
 <body class="font-sans text-gray-300">
 
-    <header class="p-12 mb-6">
+    <header class="p-16 mb-6">
         <div class="container mx-auto text-center">
-            <h1 class="text-5xl font-black tracking-[0.25em] text-white glow-text uppercase">HMTEC</h1>
-            <p class="mt-4 text-[10px] uppercase tracking-[0.6em] text-gray-500 font-light">Advanced Hardware Management</p>
+            <h1 class="text-8xl font-black tracking-[0.3em] text-white glow-text uppercase">HMTEC</h1>
+            <p class="mt-6 text-base uppercase tracking-[0.7em] text-gray-500 font-light italic">Advanced Hardware Management</p>
         </div>
     </header>
 
-    <main class="container mx-auto px-6 pb-32">
+    <main class="container mx-auto px-6 pb-40">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
             
             <div class="lg:col-span-1 menu-texture p-8 rounded-[2rem] shadow-2xl h-fit border border-white/5">
@@ -130,6 +128,12 @@
             </div>
         </div>
     </main>
+
+    <footer class="border-t border-white/5 text-gray-500 p-8 fixed bottom-0 left-0 w-full bg-black/40 backdrop-blur-md z-50">
+        <div class="container mx-auto text-center text-[10px] uppercase tracking-[0.5em] font-light">
+            Hmtec Maintenance Lab &copy; 2026 // Aracaju - SE // Powered by Google Cloud
+        </div>
+    </footer>
 
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
@@ -196,7 +200,6 @@
                 `;
                 tableBody.appendChild(row);
 
-                // GAVETA DE CHECKLIST (CORRIGIDA VISIBILIDADE)
                 const g = document.createElement('tr');
                 g.id = rowId; g.className = "hidden bg-white/[0.005]";
                 g.innerHTML = `<td colspan="6" class="p-10 border-b border-white/10">
