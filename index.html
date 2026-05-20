@@ -137,10 +137,10 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
+    const SCRIPT_URL = 'COLE_AQUI_A_URL_DO_SEU_WEB_APP';
     const tableBody = document.getElementById('pc-table-body');
 
-    // Função auxiliar para processar as imagens no histórico
+    // NOVA FUNÇÃO: Interpretador de imagens
     function formatarReport(texto) {
         if (!texto) return '';
         let html = texto.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -151,6 +151,7 @@
     async function loadMaintenances() {
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-[9px] tracking-[0.5em] text-gray-400">FETCHING DATA...</td></tr>';
         try {
+            // Alterado para mode: 'cors'
             const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime(), {mode: 'cors'});
             const data = await response.json();
             tableBody.innerHTML = ''; 
@@ -246,7 +247,7 @@
         } catch (e) { console.error(e); }
     }
 
-    // Função de Envio de Fotos (Corrigida com mode: 'cors')
+    // NOVA FUNÇÃO: Upload de fotos
     async function adicionarFoto(row) {
         const input = document.getElementById(`nova-foto-${row}`); 
         const label = document.getElementById(`label-foto-${row}`);
@@ -263,7 +264,7 @@
                 const base64 = e.target.result.split(',')[1];
                 const response = await fetch(SCRIPT_URL, { 
                     method: 'POST', 
-                    mode: 'cors',
+                    mode: 'cors', // Necessário para CORS
                     body: JSON.stringify({ action: 'uploadPhoto', row: row, base64: base64, mimeType: file.type, filename: file.name }) 
                 });
                 const d = await response.json();
@@ -279,7 +280,27 @@
         reader.readAsDataURL(file);
     }
 
-    // Funções Originais mantidas com mode: 'cors'
+    document.getElementById('add-pc-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button'); btn.innerText = 'SYNC...'; btn.disabled = true;
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', body: JSON.stringify(Object.fromEntries(new FormData(this))) }).then(() => {
+            this.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
+            setTimeout(() => loadMaintenances(), 1500);
+        });
+    });
+
+    function toggleGaveta(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('hidden');
+        el.classList.toggle('show-gaveta');
+    }
+
+    async function salvarChecklist(row, id) {
+        const c = document.getElementById(id).querySelectorAll('input[type="checkbox"]');
+        const d = { ferrugem: c[0].checked, maresia: c[1].checked, naoliga: c[2].checked, poeira: c[3].checked, danos: c[4].checked };
+        await fetch(`${SCRIPT_URL}?action=updateChecklist&row=${row}&checklist=${encodeURIComponent(JSON.stringify(d))}`, {method: 'GET', mode:'cors'});
+    }
+
     async function adicionarServico(row) {
         const f = document.getElementById(`novo-servico-${row}`); const h = document.getElementById(`historico-texto-${row}`);
         if(!f.value.trim()) return;
@@ -288,12 +309,6 @@
         h.innerHTML = formatarReport(d.textoFinal); 
         f.value = ""; 
         h.scrollTop = h.scrollHeight;
-    }
-
-    async function salvarChecklist(row, id) {
-        const c = document.getElementById(id).querySelectorAll('input[type="checkbox"]');
-        const d = { ferrugem: c[0].checked, maresia: c[1].checked, naoliga: c[2].checked, poeira: c[3].checked, danos: c[4].checked };
-        await fetch(`${SCRIPT_URL}?action=updateChecklist&row=${row}&checklist=${encodeURIComponent(JSON.stringify(d))}`, {method: 'GET', mode:'cors'});
     }
 
     async function atualizarStatus(row, s, el, i) {
@@ -307,26 +322,16 @@
         }
     }
 
-    document.getElementById('add-pc-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = this.querySelector('button'); btn.innerText = 'SYNC...'; btn.disabled = true;
-        const d = {}; new FormData(this).forEach((v, k) => d[k] = v);
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', body: JSON.stringify(d) }).then(() => {
-            this.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
-            setTimeout(() => loadMaintenances(), 1500);
-        });
-    });
-
-    function toggleGaveta(id) { document.getElementById(id).classList.toggle('hidden'); document.getElementById(id).classList.toggle('show-gaveta'); }
     function abrirWhatsApp(t, n) { 
         if(!t) return alert("SEM NÚMERO");
         const nl = t.replace(/\D/g, ''); const nf = nl.startsWith('55') ? nl : '55'+nl;
-        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC: Olá '+n)}`, '_blank'); 
+        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC: Olá '+n)}`, '_blank');
     }
+
     async function dispararEmail(e, n, m) { 
         if(!e) return alert("SEM E-MAIL");
         await fetch(`${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(e)}&name=${encodeURIComponent(n)}&model=${encodeURIComponent(m)}`, {method: 'GET', mode:'cors'});
-        alert("MAIL SENT"); 
+        alert("MAIL SENT");
     }
 
     loadMaintenances();
