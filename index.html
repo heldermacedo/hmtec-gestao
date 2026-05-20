@@ -140,6 +140,14 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
     const tableBody = document.getElementById('pc-table-body');
 
+    // Função de tratamento de imagens (Nova funcionalidade)
+    function formatarReport(texto) {
+        if (!texto) return '';
+        let html = texto.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        html = html.replace(/\[IMG:(.*?)\]/g, '<br><img src="$1" class="w-full max-w-sm h-auto rounded-xl border border-white/10 my-4 shadow-lg object-cover"><br>');
+        return html;
+    }
+
     async function loadMaintenances() {
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-[9px] tracking-[0.5em] text-gray-400">FETCHING DATA...</td></tr>';
         try {
@@ -218,10 +226,17 @@
                         </div>
                         <div>
                             <span class="text-[9px] font-black text-[var(--hmtec-lime)] tracking-[0.4em] uppercase mb-8 block">Lab Report</span>
-                            <div id="historico-texto-${item.rowNumber}" class="text-[11px] text-gray-200 bg-black/40 p-6 rounded-2xl mb-4 font-mono h-32 overflow-y-auto border border-white/10 whitespace-pre-wrap">${item.serviceDetails}</div>
+                            <div id="historico-texto-${item.rowNumber}" class="text-[11px] text-gray-200 bg-black/40 p-6 rounded-2xl mb-4 font-mono h-32 overflow-y-auto border border-white/10 whitespace-pre-wrap">${formatarReport(item.serviceDetails)}</div>
                             <div class="flex gap-2">
                                 <textarea id="novo-servico-${item.rowNumber}" class="w-full bg-black/60 border border-white/10 text-white p-4 text-[10px] rounded-2xl focus:border-[var(--hmtec-lime)]/30 focus:outline-none" rows="2" placeholder="ENTRADA TÉCNICA..."></textarea>
-                                <button onclick="adicionarServico(${item.rowNumber})" class="bg-white text-black font-black text-[9px] px-6 rounded-2xl hover:bg-[var(--hmtec-lime)] transition-all uppercase">Add</button>
+                                
+                                <div class="flex flex-col gap-2 w-24">
+                                    <button onclick="adicionarServico(${item.rowNumber})" class="bg-white text-black font-black text-[9px] h-full rounded-2xl hover:bg-[var(--hmtec-lime)] transition-all uppercase">Add</button>
+                                    <label class="bg-gray-800 text-white font-black text-[8px] h-full flex items-center justify-center rounded-2xl hover:bg-[var(--hmtec-lime)] hover:text-black transition-all uppercase cursor-pointer">
+                                        Foto
+                                        <input type="file" id="nova-foto-${item.rowNumber}" class="hidden" accept="image/*" onchange="adicionarFoto(${item.rowNumber})">
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,6 +244,26 @@
                 tableBody.appendChild(g);
             });
         } catch (e) { console.error(e); }
+    }
+
+    // Função de Envio de Fotos
+    async function adicionarFoto(row) {
+        const input = document.getElementById(`nova-foto-${row}`); const file = input.files[0];
+        if (!file) return;
+        const h = document.getElementById(`historico-texto-${row}`);
+        h.innerHTML += `<br><span class="text-[var(--hmtec-lime)] font-bold text-[9px] animate-pulse">ENVIANDO FOTO...</span>`;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64 = e.target.result.split(',')[1];
+            const response = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'uploadPhoto', row: row, base64: base64, mimeType: file.type, filename: file.name }) 
+            });
+            const d = await response.json();
+            h.innerHTML = formatarReport(d.textoFinal);
+            h.scrollTop = h.scrollHeight;
+        };
+        reader.readAsDataURL(file);
     }
 
     document.getElementById('add-pc-form').addEventListener('submit', function(e) {
@@ -257,7 +292,10 @@
         const f = document.getElementById(`novo-servico-${row}`); const h = document.getElementById(`historico-texto-${row}`);
         if(!f.value.trim()) return;
         const res = await fetch(`${SCRIPT_URL}?action=updateService&row=${row}&texto=${encodeURIComponent(f.value.trim())}`);
-        const d = await res.json(); h.innerText = d.textoFinal; f.value = ""; h.scrollTop = h.scrollHeight;
+        const d = await res.json(); 
+        h.innerHTML = formatarReport(d.textoFinal); 
+        f.value = ""; 
+        h.scrollTop = h.scrollHeight;
     }
 
     async function atualizarStatus(row, s, el, i) {
