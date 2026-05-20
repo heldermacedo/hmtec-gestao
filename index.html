@@ -1,170 +1,475 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMTEC - Performance Lab</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --hmtec-purple: #6c5ce7;
-            --hmtec-lime: #bbff00;
-            --hmtec-dark: #0d0d0f;
-        }
 
-        body {
-            background-color: var(--hmtec-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(108, 92, 231, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(187, 255, 0, 0.05) 0px, transparent 50%);
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-        .menu-texture {
-            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-            background-color: rgba(15, 15, 18, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+<title>
 
-        .hmtec-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            transition: all 0.3s ease;
-        }
+HMTEC - Performance Lab
 
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0.8;
-        }
+</title>
 
-        .hmtec-input:focus { border-color: var(--hmtec-lime); outline: none; }
+<script src="https://cdn.tailwindcss.com"></script>
 
-        .btn-action-minimal {
-            background: white;
-            color: black;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 0.1em;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
+<style>
 
-        .btn-action-minimal:hover { background: var(--hmtec-lime); transform: translateY(-1px); }
-        .glow-text { text-shadow: 0 0 30px rgba(187, 255, 0, 0.35); }
-        
-        .show-gaveta { display: table-row !important; }
+:root{
 
-        .text-label { color: #a1a1aa; font-weight: 600; }
-        .text-checklist { color: #e4e4e7; font-weight: 500; }
-    </style>
+--hmtec-purple:#6c5ce7;
+--hmtec-lime:#bbff00;
+--hmtec-dark:#0d0d0f;
+
+}
+
+body{
+
+background-color:
+var(--hmtec-dark);
+
+background-image:
+
+radial-gradient(
+at 0% 0%,
+rgba(108,92,231,.12),
+transparent 50%
+),
+
+radial-gradient(
+at 100% 100%,
+rgba(187,255,0,.05),
+transparent 50%
+);
+
+background-attachment:
+fixed;
+
+min-height:100vh;
+
+}
+
+.glass-card{
+
+background:
+rgba(
+255,
+255,
+255,
+0.02
+);
+
+backdrop-filter:
+blur(12px);
+
+border:
+1px solid
+rgba(
+255,
+255,
+255,
+0.05
+);
+
+}
+
+.menu-texture{
+
+background-image:
+
+url(
+'https://www.transparenttextures.com/patterns/carbon-fibre.png'
+);
+
+background-color:
+
+rgba(
+15,
+15,
+18,
+0.95
+);
+
+}
+
+.hmtec-input{
+
+background:
+rgba(
+0,
+0,
+0,
+0.3
+);
+
+border:
+1px solid
+rgba(
+255,
+255,
+255,
+0.15
+);
+
+color:white;
+
+}
+
+.btn-action-minimal{
+
+background:white;
+
+color:black;
+
+font-size:9px;
+
+font-weight:800;
+
+padding:6px 12px;
+
+border-radius:6px;
+
+}
+
+.btn-action-minimal:hover{
+
+background:
+var(
+--hmtec-lime
+);
+
+}
+
+.show-gaveta{
+
+display:table-row!important;
+
+}
+
+</style>
+
 </head>
+
 <body class="font-sans text-gray-300">
 
-    <header class="p-16 mb-6">
-        <div class="container mx-auto text-center">
-            <h1 class="text-8xl font-black tracking-[0.3em] text-white glow-text uppercase">HMTEC</h1>
-            <p class="mt-6 text-base uppercase tracking-[0.7em] text-gray-500 font-light italic">Gerencia de Assistencia Técnica</p>
-        </div>
-    </header>
+<header class="p-16">
 
-    <main class="container mx-auto px-6 pb-40">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
-            
-            <div class="lg:col-span-1 menu-texture p-8 rounded-[2rem] shadow-2xl h-fit border border-white/5">
-                <h2 class="text-[15px] font-black mb-10 text-white uppercase tracking-[0.3em] flex items-center">
-                    <span class="w-1.5 h-1.5 bg-[var(--hmtec-lime)] rounded-full mr-3 animate-pulse"></span>
-                    Novo Registro
-                </h2>
-                <form id="add-pc-form" class="space-y-6">
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">Cliente</label>
-                    <input type="text" name="clientName" required class="w-full hmtec-input p-3 rounded-xl text-xs"></div>
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">WhatsApp</label>
-                    <input type="tel" name="clientPhone" placeholder="79..." class="w-full hmtec-input p-3 rounded-xl text-xs"></div>
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">Configuração</label>
-                    <input type="text" name="pcModel" placeholder="GPU / CPU" class="w-full hmtec-input p-3 rounded-xl text-xs"></div>
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">E-mail</label>
-                    <input type="email" name="clientEmail" class="w-full hmtec-input p-3 rounded-xl text-xs"></div>
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">Data de Entrada</label>
-                    <input type="datetime-local" name="entryDate" required class="w-full hmtec-input p-3 rounded-xl text-xs"></div>
-                    <div><label class="text-[9px] uppercase tracking-[0.2em] text-label mb-1 block">SLA</label>
-                    <select name="sla" class="w-full hmtec-input p-3 rounded-xl text-xs bg-[#0d0d0f]">
-                        <option value="24">24 HORAS</option><option value="48">48 HORAS</option><option value="72">72 HORAS</option><option value="0">NÃO-ACORDADO</option>
-                    </select></div>
-                    <button type="submit" class="w-full bg-white text-black hover:bg-[var(--hmtec-lime)] p-4 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] transition-all duration-500">Registrar</button>
-                </form>
-            </div>
+<div class="container mx-auto text-center">
 
-            <div class="lg:col-span-3 glass-card p-10 rounded-[2rem]">
-                <div class="flex items-center justify-between mb-12">
-                    <span class="w-1.5 h-1.5 bg-[var(--hmtec-lime)] rounded-full mr-3 animate-pulse"></span>
-                    <h2 class="text-[15px] font-bold text-white uppercase tracking-[0.3em]">Monitoramento de Status</h2>
-                    <div class="text-[var(--hmtec-lime)] text-[12px] font-mono border border-[var(--hmtec-lime)]/30 px-4 py-1 rounded-full uppercase tracking-widest">Core Online</div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="text-gray-500 text-[12px] uppercase tracking-[0.3em] border-b border-white/5">
-                            <tr>
-                                <th class="pb-6 px-4">Cliente</th>
-                                <th class="pb-6 px-4">Equipamento</th>
-                                <th class="pb-6 px-4">Data/Hora</th>
-                                <th class="pb-6 px-4">Status Atual</th>
-                                <th class="pb-6 px-4 text-center">Timer Sla</th>
-                                <th class="pb-6 px-4 text-center">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pc-table-body" class="text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
+<h1 class="
+text-8xl
+font-black
+tracking-[0.3em]
+text-white
+uppercase
+">
 
-    <footer class="border-t border-white/5 text-gray-500 p-8 fixed bottom-0 left-0 w-full bg-black/40 backdrop-blur-md z-50">
-        <div class="container mx-auto text-center text-[10px] uppercase tracking-[0.5em] font-light">
-            Hmtec Maintenance Lab &copy; 2026 // Aracaju - SE // Powered by Google Cloud
-        </div>
-    </footer>
+HMTEC
 
+</h1>
+
+<p class="
+mt-6
+uppercase
+tracking-[0.7em]
+text-gray-500
+">
+
+Gerência de Assistência Técnica
+
+</p>
+
+</div>
+
+</header>
+<main class="
+container
+mx-auto
+px-6
+pb-40
+">
+
+<div class="
+grid
+grid-cols-1
+lg:grid-cols-4
+gap-10
+">
+
+<div class="
+lg:col-span-1
+menu-texture
+p-8
+rounded-[2rem]
+">
+
+<h2 class="
+text-white
+uppercase
+mb-10
+">
+
+Novo Registro
+
+</h2>
+
+<form id="add-pc-form"
+class="space-y-6">
+
+<input
+name="clientName"
+required
+placeholder="Cliente"
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<input
+name="clientPhone"
+placeholder="WhatsApp"
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<input
+name="pcModel"
+placeholder="Equipamento"
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<input
+name="clientEmail"
+placeholder="Email"
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<input
+type="datetime-local"
+name="entryDate"
+
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<select
+name="sla"
+
+class="
+w-full
+hmtec-input
+p-3
+rounded-xl
+">
+
+<option value="24">
+
+24 HORAS
+
+</option>
+
+<option value="48">
+
+48 HORAS
+
+</option>
+
+<option value="72">
+
+72 HORAS
+
+</option>
+
+<option value="0">
+
+NÃO ACORDADO
+
+</option>
+
+</select>
+
+<button
+type="submit"
+
+class="
+w-full
+bg-white
+text-black
+p-4
+rounded-xl
+font-black
+">
+
+REGISTRAR
+
+</button>
+
+</form>
+
+</div>
+
+<div class="
+lg:col-span-3
+glass-card
+p-10
+rounded-[2rem]
+">
+
+<div class="
+flex
+justify-between
+mb-8
+">
+
+<h2 class="
+uppercase
+text-white
+">
+
+Monitoramento
+
+</h2>
+
+<div
+id="api-status"
+
+class="
+text-[var(--hmtec-lime)]
+border
+px-4
+py-1
+rounded-full
+uppercase
+">
+
+SYNC
+
+</div>
+
+</div>
+
+<input
+
+id="pesquisa"
+
+placeholder="
+Buscar cliente...
+"
+
+class="
+hmtec-input
+p-3
+rounded-xl
+w-full
+mb-8
+"
+
+>
+
+<div class="overflow-x-auto">
+
+<table class="w-full">
+
+<thead>
+
+<tr>
+
+<th>
+
+Cliente
+
+</th>
+
+<th>
+
+Equipamento
+
+</th>
+
+<th>
+
+Entrada
+
+</th>
+
+<th>
+
+Status
+
+</th>
+
+<th>
+
+SLA
+
+</th>
+
+<th>
+
+Ações
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="pc-table-body">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
 <script>
 
-const SCRIPT_URL =
+const SCRIPT_URL=
 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
 
-const tableBody =
+const tableBody=
 document.getElementById(
 'pc-table-body'
 );
 
-let gavetasAbertas =
+let gavetasAbertas=
 new Set();
 
-function formatarReport(texto){
+function formatarReport(t){
 
-if(!texto) return '';
+if(!t)return'';
 
-let html=
-texto
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;");
+return t.replace(
 
-html=
-html.replace(
 /\[IMG:(.*?)\]/g,
-'<br><img src="$1" class="w-full max-w-sm rounded-xl border border-white/10 my-4"><br>'
-);
 
-return html;
+'<img src="$1" class="w-48 rounded-xl my-4">'
+
+);
 
 }
 
@@ -173,27 +478,25 @@ async function pingApi(){
 try{
 
 await fetch(
-`${SCRIPT_URL}?action=list&t=${Date.now()}`
+`${SCRIPT_URL}?action=list`
 );
 
-const el=
-document.getElementById(
+document
+.getElementById(
 'api-status'
-);
+)
 
-if(el)
-el.innerHTML=
+innerText=
 'ONLINE';
 
 }catch{
 
-const el=
-document.getElementById(
+document
+.getElementById(
 'api-status'
-);
+)
 
-if(el)
-el.innerHTML=
+innerText=
 'OFFLINE';
 
 }
@@ -202,180 +505,46 @@ el.innerHTML=
 
 async function loadMaintenances(){
 
-tableBody.innerHTML=
-`
-<tr>
-
-<td colspan="6"
-class="
-text-center
-py-20
-text-[9px]
-tracking-[0.5em]
-text-gray-400
-">
-
-FETCHING DATA...
-
-</td>
-
-</tr>
-`;
-
-try{
-
-const response=
+const r=
 await fetch(
 `${SCRIPT_URL}?action=list&t=${Date.now()}`
 );
 
-if(!response.ok)
-throw new Error(
-response.status
-);
-
 const data=
-await response.json();
+await r.json();
 
 tableBody.innerHTML='';
 
 data.forEach(item=>{
 
-let dataFormatada='N/A';
-
-if(item.entryDate){
-
-const partes=
-item.entryDate
-.split('T');
-
-const d=
-partes[0]
-.split('-');
-
-const h=
-partes[1]
-?
-partes[1]
-.substring(
-0,
-5
-)
-:
-'';
-
-dataFormatada=
-`${d[2]}/${d[1]} ${h}`;
-
-}
-
-let checks={};
-
-try{
-
-checks=
-JSON.parse(
-item.checklist
-);
-
-}catch{
-
-checks={};
-
-}
-
-const rowId=
-`gaveta-${item.rowNumber}`;
-
-const row=
+const tr=
 document.createElement(
 'tr'
 );
 
-row.className=
-`
-border-b
-border-white/5
-hover:bg-white/[0.01]
-cursor-pointer
-`;
+tr.innerHTML=`
 
-row.innerHTML=`
-
-<td class="py-6 px-4">
+<td>
 
 ${item.clientName}
 
 </td>
 
-<td class="py-6 px-4">
+<td>
 
 ${item.pcModel}
 
 </td>
 
-<td class="py-6 px-4">
+<td>
 
-${dataFormatada}
+${item.entryDate}
 
 </td>
 
-<td class="py-6 px-4">
+<td>
 
-<select
-
-data-item='${JSON.stringify(item)}'
-
-onchange="
-atualizarStatus(
-${item.rowNumber},
-this.value,
-this
-)
-"
-
-class="
-bg-transparent
-text-white
-text-[9px]
-uppercase
-"
-
->
-
-<option
-${item.status==='Aguardando Autorização'?'selected':''}
->
-
-Aguardando Autorização
-
-</option>
-
-<option
-${item.status==='Aguardando Peças'?'selected':''}
->
-
-Aguardando Peças
-
-</option>
-
-<option
-${item.status==='Aguardando Testes Finais'?'selected':''}
->
-
-Aguardando Testes Finais
-
-</option>
-
-<option
-${item.status==='Finalizado'?'selected':''}
->
-
-Finalizado
-
-</option>
-
-</select>
+${item.status}
 
 </td>
 
@@ -383,13 +552,12 @@ Finalizado
 
 ${item.sla}
 
-h
-
 </td>
 
 <td>
 
 <button
+
 onclick="
 abrirWhatsApp(
 '${item.clientPhone}',
@@ -412,376 +580,10 @@ WPP
 `;
 
 tableBody.appendChild(
-row
-);
-
-const g=
-document.createElement(
-'tr'
-);
-
-g.id=rowId;
-
-g.className=
-hidden;
-
-g.innerHTML=`
-
-<td colspan="6">
-
-<div class="p-8">
-
-<div
-id="historico-texto-${item.rowNumber}"
-class="
-bg-black/40
-rounded-xl
-p-4
-mb-4
-whitespace-pre-wrap
-"
->
-
-${formatarReport(
-item.serviceDetails
-)}
-
-</div>
-
-<textarea
-
-id="novo-servico-${item.rowNumber}"
-
-class="
-w-full
-bg-black/50
-p-4
-rounded-xl
-"
-
-></textarea>
-
-<div class="flex gap-2 mt-2">
-
-<button
-
-onclick="
-adicionarServico(
-${item.rowNumber}
-)
-"
-
-class="
-btn-action-minimal
-"
-
->
-
-ADD
-
-</button>
-
-<label
-class="
-btn-action-minimal
-cursor-pointer
-">
-
-FOTO
-
-<input
-hidden
-type="file"
-accept="image/*"
-id="nova-foto-${item.rowNumber}"
-onchange="
-adicionarFoto(
-${item.rowNumber}
-)
-"
-/>
-
-</label>
-
-</div>
-
-</div>
-
-</td>
-
-`;
-
-tableBody.appendChild(
-g
+tr
 );
 
 });
-
-gavetasAbertas.forEach(
-id=>{
-
-const el=
-document.getElementById(
-id
-);
-
-if(el){
-
-el.classList.remove(
-'hidden'
-);
-
-el.classList.add(
-'show-gaveta'
-);
-
-}
-
-}
-);
-
-}catch(e){
-
-console.error(e);
-
-}
-
-}
-
-function toggleGaveta(id){
-
-const el=
-document.getElementById(
-id
-);
-
-el.classList.toggle(
-'hidden'
-);
-
-el.classList.toggle(
-'show-gaveta'
-);
-
-if(
-el.classList.contains(
-'show-gaveta'
-)
-)
-
-gavetasAbertas.add(
-id
-);
-
-else
-
-gavetasAbertas.delete(
-id
-);
-
-}
-
-async function adicionarFoto(row){
-
-const input=
-document.getElementById(
-`nova-foto-${row}`
-);
-
-const file=
-input.files[0];
-
-if(!file)
-return;
-
-if(
-!file.type.startsWith(
-'image/'
-)
-){
-
-alert(
-'Apenas imagens'
-);
-
-return;
-
-}
-
-if(
-file.size>
-5*1024*1024
-){
-
-alert(
-'Máximo 5MB'
-);
-
-return;
-
-}
-
-const reader=
-new FileReader();
-
-reader.onload=
-async function(e){
-
-const base64=
-e.target.result
-.split(',')[1];
-
-await fetch(
-SCRIPT_URL,
-{
-
-method:'POST',
-
-headers:{
-'Content-Type':
-'application/json'
-},
-
-body:
-JSON.stringify({
-
-action:
-'uploadPhoto',
-
-row,
-
-base64,
-
-mimeType:
-file.type,
-
-filename:
-file.name
-
-})
-
-}
-
-);
-
-loadMaintenances();
-
-};
-
-reader.readAsDataURL(
-file
-);
-
-}
-
-async function adicionarServico(row){
-
-const campo=
-document.getElementById(
-`novo-servico-${row}`
-);
-
-if(
-!campo.value.trim()
-)
-return;
-
-await fetch(
-
-`${SCRIPT_URL}
-
-?action=updateService
-
-&row=${row}
-
-&texto=${encodeURIComponent(
-campo.value
-)}`
-
-);
-
-campo.value='';
-
-loadMaintenances();
-
-}
-
-async function atualizarStatus(
-row,
-status,
-el
-){
-
-await fetch(
-
-`${SCRIPT_URL}
-
-?action=updateStatus
-
-&row=${row}
-
-&status=${encodeURIComponent(
-status
-)}`
-
-);
-
-if(
-status==='Finalizado'
-){
-
-const item=
-JSON.parse(
-el.dataset.item
-);
-
-const j=
-window.open(
-'',
-'',
-'width=800,height=600'
-);
-
-j.document.write(
-
-`
-
-<h1>
-
-HMTEC LAB REPORT
-
-</h1>
-
-<p>
-
-${item.clientName}
-
-</p>
-
-<p>
-
-${item.pcModel}
-
-</p>
-
-<pre>
-
-${document.getElementById(
-`historico-texto-${row}`
-).innerText}
-
-</pre>
-
-`
-
-);
-
-setTimeout(
-()=>j.print(),
-500
-);
-
-}
 
 }
 
@@ -790,26 +592,11 @@ t,
 n
 ){
 
-if(!t){
-
-alert(
-'SEM NÚMERO'
-);
-
-return;
-
-}
-
-const num=
-t
-.replace(
-/\D/g,
-''
-);
+if(!t)return;
 
 window.open(
 
-`https://wa.me/55${num}
+`https://wa.me/55${t.replace(/\D/g,'')}
 
 ?text=${encodeURIComponent(
 'HMTEC: Olá '+n
@@ -828,6 +615,7 @@ document
 
 .addEventListener(
 'submit',
+
 async function(e){
 
 e.preventDefault();
@@ -843,14 +631,18 @@ dados.action=
 'newRecord';
 
 await fetch(
+
 SCRIPT_URL,
+
 {
 
 method:'POST',
 
 headers:{
+
 'Content-Type':
 'application/json'
+
 },
 
 body:
@@ -859,6 +651,7 @@ dados
 )
 
 }
+
 );
 
 this.reset();
@@ -866,7 +659,48 @@ this.reset();
 loadMaintenances();
 
 }
+
 );
+
+document
+.getElementById(
+'pesquisa'
+)
+
+.addEventListener(
+'input',
+e=>{
+
+const termo=
+e.target.value
+.toLowerCase();
+
+document
+.querySelectorAll(
+'#pc-table-body tr'
+)
+
+.forEach(l=>{
+
+l.style.display=
+
+l.innerText
+.toLowerCase()
+.includes(
+termo
+)
+
+?
+
+''
+
+:
+
+'none';
+
+});
+
+});
 
 pingApi();
 
@@ -878,5 +712,7 @@ pingApi,
 );
 
 </script>
+
 </body>
+
 </html>
