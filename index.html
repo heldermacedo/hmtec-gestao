@@ -140,7 +140,7 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO4PI9HE8XAgq-7qeJlA26W2S8tkvlurUzBoIzxbVxqCvIBzwpEgV9GvPRPlLMOjQTYQ/exec';
     const tableBody = document.getElementById('pc-table-body');
 
-    // Função de tratamento de imagens (Nova funcionalidade)
+    // Função auxiliar para processar as imagens no histórico
     function formatarReport(texto) {
         if (!texto) return '';
         let html = texto.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -151,7 +151,7 @@
     async function loadMaintenances() {
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-[9px] tracking-[0.5em] text-gray-400">FETCHING DATA...</td></tr>';
         try {
-            const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
+            const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime(), {mode: 'cors'});
             const data = await response.json();
             tableBody.innerHTML = ''; 
             
@@ -232,8 +232,8 @@
                                 
                                 <div class="flex flex-col gap-2 w-24">
                                     <button onclick="adicionarServico(${item.rowNumber})" class="bg-white text-black font-black text-[9px] h-full rounded-2xl hover:bg-[var(--hmtec-lime)] transition-all uppercase">Add</button>
-                                    <label class="bg-gray-800 text-white font-black text-[8px] h-full flex items-center justify-center rounded-2xl hover:bg-[var(--hmtec-lime)] hover:text-black transition-all uppercase cursor-pointer">
-                                        Foto
+                                    <label id="label-foto-${item.rowNumber}" class="bg-gray-800 text-white font-black text-[8px] h-full flex items-center justify-center rounded-2xl hover:bg-[var(--hmtec-lime)] hover:text-black transition-all uppercase cursor-pointer">
+                                        FOTO
                                         <input type="file" id="nova-foto-${item.rowNumber}" class="hidden" accept="image/*" onchange="adicionarFoto(${item.rowNumber})">
                                     </label>
                                 </div>
@@ -246,60 +246,58 @@
         } catch (e) { console.error(e); }
     }
 
-    // Função de Envio de Fotos
+    // Função de Envio de Fotos (Corrigida com mode: 'cors')
     async function adicionarFoto(row) {
-        const input = document.getElementById(`nova-foto-${row}`); const file = input.files[0];
+        const input = document.getElementById(`nova-foto-${row}`); 
+        const label = document.getElementById(`label-foto-${row}`);
+        const file = input.files[0];
         if (!file) return;
+
         const h = document.getElementById(`historico-texto-${row}`);
-        h.innerHTML += `<br><span class="text-[var(--hmtec-lime)] font-bold text-[9px] animate-pulse">ENVIANDO FOTO...</span>`;
+        const originalText = label.innerText;
+        label.innerText = "ENVIANDO...";
+        
         const reader = new FileReader();
         reader.onload = async function(e) {
-            const base64 = e.target.result.split(',')[1];
-            const response = await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'uploadPhoto', row: row, base64: base64, mimeType: file.type, filename: file.name }) 
-            });
-            const d = await response.json();
-            h.innerHTML = formatarReport(d.textoFinal);
-            h.scrollTop = h.scrollHeight;
+            try {
+                const base64 = e.target.result.split(',')[1];
+                const response = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'cors',
+                    body: JSON.stringify({ action: 'uploadPhoto', row: row, base64: base64, mimeType: file.type, filename: file.name }) 
+                });
+                const d = await response.json();
+                h.innerHTML = formatarReport(d.textoFinal);
+                h.scrollTop = h.scrollHeight;
+                alert("Foto enviada com sucesso!");
+            } catch(err) { 
+                alert("Erro ao enviar: " + err); 
+            } finally { 
+                label.innerText = originalText; 
+            }
         };
         reader.readAsDataURL(file);
     }
 
-    document.getElementById('add-pc-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button'); btn.innerText = 'SYNC...'; btn.disabled = true;
-        const d = {}; new FormData(this).forEach((v, k) => d[k] = v);
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) }).then(() => {
-            this.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
-            setTimeout(() => loadMaintenances(), 1500);
-        });
-    });
-
-    function toggleGaveta(id) {
-        const el = document.getElementById(id);
-        el.classList.toggle('hidden');
-        el.classList.toggle('show-gaveta');
-    }
-
-    async function salvarChecklist(row, id) {
-        const c = document.getElementById(id).querySelectorAll('input[type="checkbox"]');
-        const d = { ferrugem: c[0].checked, maresia: c[1].checked, naoliga: c[2].checked, poeira: c[3].checked, danos: c[4].checked };
-        await fetch(`${SCRIPT_URL}?action=updateChecklist&row=${row}&checklist=${encodeURIComponent(JSON.stringify(d))}`, {mode:'no-cors'});
-    }
-
+    // Funções Originais mantidas com mode: 'cors'
     async function adicionarServico(row) {
         const f = document.getElementById(`novo-servico-${row}`); const h = document.getElementById(`historico-texto-${row}`);
         if(!f.value.trim()) return;
-        const res = await fetch(`${SCRIPT_URL}?action=updateService&row=${row}&texto=${encodeURIComponent(f.value.trim())}`);
+        const res = await fetch(`${SCRIPT_URL}?action=updateService&row=${row}&texto=${encodeURIComponent(f.value.trim())}`, {method: 'GET', mode: 'cors'});
         const d = await res.json(); 
         h.innerHTML = formatarReport(d.textoFinal); 
         f.value = ""; 
         h.scrollTop = h.scrollHeight;
     }
 
+    async function salvarChecklist(row, id) {
+        const c = document.getElementById(id).querySelectorAll('input[type="checkbox"]');
+        const d = { ferrugem: c[0].checked, maresia: c[1].checked, naoliga: c[2].checked, poeira: c[3].checked, danos: c[4].checked };
+        await fetch(`${SCRIPT_URL}?action=updateChecklist&row=${row}&checklist=${encodeURIComponent(JSON.stringify(d))}`, {method: 'GET', mode:'cors'});
+    }
+
     async function atualizarStatus(row, s, el, i) {
-        await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`, {mode:'no-cors'});
+        await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`, {method: 'GET', mode:'cors'});
         loadMaintenances();
         if(s === 'Finalizado') {
             const item = JSON.parse(decodeURIComponent(i));
@@ -309,16 +307,26 @@
         }
     }
 
+    document.getElementById('add-pc-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = this.querySelector('button'); btn.innerText = 'SYNC...'; btn.disabled = true;
+        const d = {}; new FormData(this).forEach((v, k) => d[k] = v);
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', body: JSON.stringify(d) }).then(() => {
+            this.reset(); btn.innerText = 'REGISTRAR'; btn.disabled = false;
+            setTimeout(() => loadMaintenances(), 1500);
+        });
+    });
+
+    function toggleGaveta(id) { document.getElementById(id).classList.toggle('hidden'); document.getElementById(id).classList.toggle('show-gaveta'); }
     function abrirWhatsApp(t, n) { 
         if(!t) return alert("SEM NÚMERO");
         const nl = t.replace(/\D/g, ''); const nf = nl.startsWith('55') ? nl : '55'+nl;
-        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC PERFORMANCE: Olá '+n)}`, '_blank');
+        window.open(`https://wa.me/${nf}?text=${encodeURIComponent('HMTEC: Olá '+n)}`, '_blank'); 
     }
-
     async function dispararEmail(e, n, m) { 
         if(!e) return alert("SEM E-MAIL");
-        await fetch(`${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(e)}&name=${encodeURIComponent(n)}&model=${encodeURIComponent(m)}`, {mode:'no-cors'});
-        alert("MAIL SENT");
+        await fetch(`${SCRIPT_URL}?action=sendEmail&email=${encodeURIComponent(e)}&name=${encodeURIComponent(n)}&model=${encodeURIComponent(m)}`, {method: 'GET', mode:'cors'});
+        alert("MAIL SENT"); 
     }
 
     loadMaintenances();
