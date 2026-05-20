@@ -28,8 +28,7 @@ HMTEC - Performance Lab
 
 body{
 
-background-color:
-var(--hmtec-dark);
+background-color:var(--hmtec-dark);
 
 background-image:
 
@@ -45,8 +44,7 @@ rgba(187,255,0,.05),
 transparent 50%
 );
 
-background-attachment:
-fixed;
+background-attachment:fixed;
 
 min-height:100vh;
 
@@ -79,13 +77,11 @@ rgba(
 .menu-texture{
 
 background-image:
-
 url(
 'https://www.transparenttextures.com/patterns/carbon-fibre.png'
 );
 
 background-color:
-
 rgba(
 15,
 15,
@@ -118,6 +114,12 @@ color:white;
 
 }
 
+.show-gaveta{
+
+display:table-row!important;
+
+}
+
 .btn-action-minimal{
 
 background:white;
@@ -143,19 +145,13 @@ var(
 
 }
 
-.show-gaveta{
-
-display:table-row!important;
-
-}
-
 </style>
 
 </head>
 
 <body class="font-sans text-gray-300">
 
-<header class="p-16">
+<header class="p-16 mb-6">
 
 <div class="container mx-auto text-center">
 
@@ -178,19 +174,14 @@ tracking-[0.7em]
 text-gray-500
 ">
 
-Gerência de Assistência Técnica
+Gerência Assistência Técnica
 
 </p>
 
 </div>
 
 </header>
-<main class="
-container
-mx-auto
-px-6
-pb-40
-">
+<main class="container mx-auto px-6 pb-40">
 
 <div class="
 grid
@@ -206,18 +197,9 @@ p-8
 rounded-[2rem]
 ">
 
-<h2 class="
-text-white
-uppercase
-mb-10
-">
-
-Novo Registro
-
-</h2>
-
-<form id="add-pc-form"
-class="space-y-6">
+<form
+id="add-pc-form"
+class="space-y-4">
 
 <input
 name="clientName"
@@ -281,29 +263,10 @@ p-3
 rounded-xl
 ">
 
-<option value="24">
-
-24 HORAS
-
-</option>
-
-<option value="48">
-
-48 HORAS
-
-</option>
-
-<option value="72">
-
-72 HORAS
-
-</option>
-
-<option value="0">
-
-NÃO ACORDADO
-
-</option>
+<option value="24">24H</option>
+<option value="48">48H</option>
+<option value="72">72H</option>
+<option value="0">NÃO ACORDADO</option>
 
 </select>
 
@@ -340,12 +303,9 @@ justify-between
 mb-8
 ">
 
-<h2 class="
-uppercase
-text-white
-">
+<h2>
 
-Monitoramento
+MONITORAMENTO
 
 </h2>
 
@@ -376,10 +336,10 @@ Buscar cliente...
 "
 
 class="
+w-full
 hmtec-input
 p-3
 rounded-xl
-w-full
 mb-8
 "
 
@@ -393,41 +353,12 @@ mb-8
 
 <tr>
 
-<th>
-
-Cliente
-
-</th>
-
-<th>
-
-Equipamento
-
-</th>
-
-<th>
-
-Entrada
-
-</th>
-
-<th>
-
-Status
-
-</th>
-
-<th>
-
-SLA
-
-</th>
-
-<th>
-
-Ações
-
-</th>
+<th>Cliente</th>
+<th>Equipamento</th>
+<th>Entrada</th>
+<th>Status</th>
+<th>SLA</th>
+<th>Ações</th>
 
 </tr>
 
@@ -467,39 +398,42 @@ return t.replace(
 
 /\[IMG:(.*?)\]/g,
 
-'<img src="$1" class="w-48 rounded-xl my-4">'
+'<img src="$1" class="w-full max-w-sm rounded-xl my-4">'
 
 );
 
 }
 
-async function pingApi(){
+function toggleGaveta(id){
 
-try{
-
-await fetch(
-`${SCRIPT_URL}?action=list`
+const el=
+document.getElementById(
+id
 );
 
-document
-.getElementById(
-'api-status'
+el.classList.toggle(
+'hidden'
+);
+
+el.classList.toggle(
+'show-gaveta'
+);
+
+if(
+el.classList.contains(
+'show-gaveta'
+)
 )
 
-innerText=
-'ONLINE';
+gavetasAbertas.add(
+id
+);
 
-}catch{
+else
 
-document
-.getElementById(
-'api-status'
-)
-
-innerText=
-'OFFLINE';
-
-}
+gavetasAbertas.delete(
+id
+);
 
 }
 
@@ -507,7 +441,13 @@ async function loadMaintenances(){
 
 const r=
 await fetch(
-`${SCRIPT_URL}?action=list&t=${Date.now()}`
+
+`${SCRIPT_URL}
+
+?action=list
+
+&t=${Date.now()}`
+
 );
 
 const data=
@@ -517,10 +457,21 @@ tableBody.innerHTML='';
 
 data.forEach(item=>{
 
+const rowId=
+`gaveta-${item.rowNumber}`;
+
 const tr=
 document.createElement(
 'tr'
 );
+
+tr.onclick=
+()=>toggleGaveta(
+rowId
+);
+
+tr.className=
+'cursor-pointer';
 
 tr.innerHTML=`
 
@@ -557,16 +508,16 @@ ${item.sla}
 <td>
 
 <button
+class="
+btn-action-minimal
+"
 
 onclick="
+event.stopPropagation();
 abrirWhatsApp(
 '${item.clientPhone}',
 '${item.clientName}'
 )
-"
-
-class="
-btn-action-minimal
 "
 
 >
@@ -582,6 +533,68 @@ WPP
 tableBody.appendChild(
 tr
 );
+  const g=
+document.createElement(
+'tr'
+);
+
+g.id=rowId;
+
+g.className='hidden';
+
+g.innerHTML=`
+
+<td colspan="6">
+
+<div class="
+bg-black/30
+p-8
+rounded-2xl
+my-4
+">
+
+<div
+id="historico-texto-${item.rowNumber}"
+
+class="
+bg-black/40
+p-4
+rounded-xl
+mb-4
+whitespace-pre-wrap
+"
+
+>
+
+${formatarReport(
+item.serviceDetails
+)}
+
+</div>
+
+<textarea
+
+id="novo-servico-${item.rowNumber}"
+
+rows="3"
+
+class="
+w-full
+hmtec-input
+p-4
+rounded-xl
+"
+
+></textarea>
+
+</div>
+
+</td>
+
+`;
+
+tableBody.appendChild(
+g);
 
 });
 
@@ -610,65 +623,12 @@ window.open(
 
 document
 .getElementById(
-'add-pc-form'
-)
-
-.addEventListener(
-'submit',
-
-async function(e){
-
-e.preventDefault();
-
-let dados=
-Object.fromEntries(
-new FormData(
-this
-)
-);
-
-dados.action=
-'newRecord';
-
-await fetch(
-
-SCRIPT_URL,
-
-{
-
-method:'POST',
-
-headers:{
-
-'Content-Type':
-'application/json'
-
-},
-
-body:
-JSON.stringify(
-dados
-)
-
-}
-
-);
-
-this.reset();
-
-loadMaintenances();
-
-}
-
-);
-
-document
-.getElementById(
 'pesquisa'
 )
 
 .addEventListener(
 'input',
+
 e=>{
 
 const termo=
@@ -680,11 +640,12 @@ document
 '#pc-table-body tr'
 )
 
-.forEach(l=>{
+.forEach(
+r=>{
 
-l.style.display=
+r.style.display=
 
-l.innerText
+r.innerText
 .toLowerCase()
 .includes(
 termo
@@ -702,14 +663,7 @@ termo
 
 });
 
-pingApi();
-
 loadMaintenances();
-
-setInterval(
-pingApi,
-30000
-);
 
 </script>
 
